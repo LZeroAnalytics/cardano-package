@@ -15,10 +15,21 @@ def deploy_messagelib(plan, cardano_context, endpoint_address):
     
     plan.print("Deploying LayerZero MessageLib contract to Cardano...")
     
-    # Upload contract files from local directory
+    # Upload only essential contract files (excluding node_modules)
     contract_files = plan.upload_files(
-        src="./",
+        src="contracts/",
         name="messagelib-contract-files"
+    )
+    
+    # Upload package configuration files
+    package_files = plan.upload_files(
+        src="package.json",
+        name="messagelib-package-files"
+    )
+    
+    tsconfig_files = plan.upload_files(
+        src="tsconfig.json", 
+        name="messagelib-tsconfig-files"
     )
     
     # Deploy contract using Cardano transaction
@@ -27,7 +38,9 @@ def deploy_messagelib(plan, cardano_context, endpoint_address):
         config=ServiceConfig(
             image=constants.PLU_TS_IMAGE,
             files={
-                "/contracts": contract_files,
+                "/contracts/contracts": contract_files,
+                "/contracts/package.json": package_files,
+                "/contracts/tsconfig.json": tsconfig_files,
             },
             cmd=[
                 "sh", "-c",
