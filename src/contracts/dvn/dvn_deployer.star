@@ -69,12 +69,12 @@ def deploy_dvn(plan, cardano_context, endpoint_address):
         timeout="300s"
     )
     
-    # Get deployed contract address
-    dvn_address = plan.exec(
-        service_name="dvn-deployer",
-        recipe=ExecRecipe(
-            command=["cat", "/tmp/dvn-address.txt"]
-        )
+    # Get deployed contract address using run_sh instead of exec
+    dvn_address = plan.run_sh(
+        name="get-dvn-address",
+        description="Get deployed dvn contract address",
+        image=constants.PLU_TS_IMAGE,
+        run="cat /tmp/dvn-address.txt"
     )
     
     plan.print("DVN deployed at address: {}".format(dvn_address.output))

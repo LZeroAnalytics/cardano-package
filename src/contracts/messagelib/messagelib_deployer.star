@@ -69,12 +69,12 @@ def deploy_messagelib(plan, cardano_context, endpoint_address):
         timeout="300s"
     )
     
-    # Get deployed contract address
-    messagelib_address = plan.exec(
-        service_name="messagelib-deployer",
-        recipe=ExecRecipe(
-            command=["cat", "/tmp/messagelib-address.txt"]
-        )
+    # Get deployed contract address using run_sh instead of exec
+    messagelib_address = plan.run_sh(
+        name="get-messagelib-address",
+        description="Get deployed messagelib contract address",
+        image=constants.PLU_TS_IMAGE,
+        run="cat /tmp/messagelib-address.txt"
     )
     
     plan.print("MessageLib deployed at address: {}".format(messagelib_address.output))

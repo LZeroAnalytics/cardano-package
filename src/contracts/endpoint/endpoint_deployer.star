@@ -69,12 +69,12 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
         timeout="300s"
     )
     
-    # Get deployed contract address
-    endpoint_address = plan.exec(
-        service_name="endpoint-deployer",
-        recipe=ExecRecipe(
-            command=["cat", "/tmp/endpoint-address.txt"]
-        )
+    # Get deployed contract address using run_sh instead of exec
+    endpoint_address = plan.run_sh(
+        name="get-endpoint-address",
+        description="Get deployed endpoint contract address",
+        image=constants.PLU_TS_IMAGE,
+        run="cat /tmp/endpoint-address.txt"
     )
     
     plan.print("EndpointV2 deployed at address: {}".format(endpoint_address.output))
