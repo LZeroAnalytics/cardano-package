@@ -17,7 +17,7 @@ def deploy_executor(plan, cardano_context, endpoint_address):
     
     # Upload contract files from local directory
     contract_files = plan.upload_files(
-        src="src/contracts/executor/",
+        src="./",
         name="executor-contract-files"
     )
     

@@ -112,74 +112,9 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
 def _generate_cardano_config(plan, cardano_params):
     """Generate Cardano node configuration files"""
     
-    # Basic node configuration
-    config_json = {
-        "AlonzoGenesisFile": "alonzo-genesis.json",
-        "AlonzoGenesisHash": "7e94a15f55d1e82d10f09203fa04bd80b016838e2ed3f0b7e5b175a65c1a99a7",
-        "ByronGenesisFile": "byron-genesis.json", 
-        "ByronGenesisHash": "5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb",
-        "ConwayGenesisFile": "conway-genesis.json",
-        "ConwayGenesisHash": "f28f1c1280ea0d32f8cd3143e268650d6c1a8e221522ce4a7d20d62fc09783b7",
-        "ShelleyGenesisFile": "shelley-genesis.json",
-        "ShelleyGenesisHash": "1a3be38bcbb7911969283716ad7aa550250226b76a61fc51cc9a9a35d9276d81",
-        "Protocol": "Cardano",
-        "RequiresNetworkMagic": "RequiresNoMagic" if cardano_params.network == "mainnet" else "RequiresMagic",
-        "EnableLogMetrics": False,
-        "EnableLogging": True,
-        "hasEKG": 12788,
-        "hasPrometheus": ["127.0.0.1", 12798],
-        "minSeverity": "Info",
-        "TraceBlockFetchClient": False,
-        "TraceBlockFetchDecisions": False,
-        "TraceBlockFetchProtocol": False,
-        "TraceBlockFetchProtocolSerialised": False,
-        "TraceBlockFetchServer": False,
-        "TraceChainDb": True,
-        "TraceChainSyncBlockServer": False,
-        "TraceChainSyncClient": False,
-        "TraceChainSyncHeaderServer": False,
-        "TraceChainSyncProtocol": False,
-        "TraceDNSResolver": True,
-        "TraceDNSSubscription": True,
-        "TraceErrorPolicy": True,
-        "TraceForge": True,
-        "TraceHandshake": False,
-        "TraceIpSubscription": True,
-        "TraceLocalChainSyncProtocol": False,
-        "TraceLocalErrorPolicy": True,
-        "TraceLocalHandshake": False,
-        "TraceLocalTxSubmissionProtocol": False,
-        "TraceLocalTxSubmissionServer": False,
-        "TraceMempool": True,
-        "TraceMux": False,
-        "TraceTxInbound": False,
-        "TraceTxOutbound": False,
-        "TraceTxSubmissionProtocol": False
-    }
-    
-    # Network topology
-    topology_json = {
-        "Producers": [
-            {
-                "addr": "relays-new.cardano-testnet.iohkdev.io",
-                "port": 3001,
-                "valency": 2
-            }
-        ]
-    }
-    
-    # Submit API configuration
-    submit_api_json = {
-        "EnableLogMetrics": False,
-        "EnableLogging": True,
-        "ScribeKind": "StdoutSK",
-        "ScribeFormat": "ScribeFormatText",
-        "minSeverity": "Info"
-    }
-    
-    # Upload configuration files
+    # Use the existing static configuration files
     config_files = plan.upload_files(
-        src="src/cardano_node/static_files/cardano_config/",
+        src="static_files/cardano_config/",
         name="cardano-config-files"
     )
     

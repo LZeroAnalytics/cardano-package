@@ -17,7 +17,7 @@ def deploy_dvn(plan, cardano_context, endpoint_address):
     
     # Upload contract files from local directory
     contract_files = plan.upload_files(
-        src="src/contracts/dvn/",
+        src="./",
         name="dvn-contract-files"
     )
     

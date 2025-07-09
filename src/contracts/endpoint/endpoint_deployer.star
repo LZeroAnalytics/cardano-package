@@ -17,7 +17,7 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
     
     # Upload contract files from local directory
     contract_files = plan.upload_files(
-        src="src/contracts/endpoint/",
+        src="./",
         name="endpoint-contract-files"
     )
     
