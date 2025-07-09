@@ -1,0 +1,7 @@
+{
+  "EnableLogMetrics": false,
+  "EnableLogging": true,
+  "ScribeKind": "StdoutSK",
+  "ScribeFormat": "ScribeFormatText",
+  "minSeverity": "Info"
+}

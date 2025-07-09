@@ -1,0 +1,17 @@
+{
+  "AlonzoGenesisFile": "alonzo-genesis.json",
+  "AlonzoGenesisHash": "7e94a15f55d1e82d10f09203fa04bd80b016838e2ed3f0b7e5b175a65c1a99a7",
+  "ByronGenesisFile": "byron-genesis.json", 
+  "ByronGenesisHash": "5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb",
+  "ConwayGenesisFile": "conway-genesis.json",
+  "ConwayGenesisHash": "f28f1c1280ea0d32f8cd3143e268650d6c1a8e221522ce4a7d20d62fc09783b7",
+  "ShelleyGenesisFile": "shelley-genesis.json",
+  "ShelleyGenesisHash": "1a3be38bcbb7911969283716ad7aa550250226b76a61fc51cc9a9a35d9276d81",
+  "Protocol": "Cardano",
+  "RequiresNetworkMagic": "RequiresMagic",
+  "EnableLogMetrics": false,
+  "EnableLogging": true,
+  "hasEKG": 12788,
+  "hasPrometheus": ["127.0.0.1", 12798],
+  "minSeverity": "Info"
+}
