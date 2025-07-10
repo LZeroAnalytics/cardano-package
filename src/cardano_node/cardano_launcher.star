@@ -43,16 +43,15 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
         )
     )
     
-    # Wait for Cardano node to be ready (check HTTP monitoring port)
+    # Wait for Cardano node to be ready (check if node port is accessible)
     plan.wait(
         service_name=constants.CARDANO_NODE_SERVICE,
-        recipe=GetHttpRequestRecipe(
-            port_id="http",
-            endpoint="/"
+        recipe=ExecRecipe(
+            command=["sh", "-c", "netstat -ln | grep :6000 || ss -ln | grep :6000"]
         ),
         field="code",
         assertion="==",
-        target_value=200,  # HTTP monitoring should return 200
+        target_value=0,  # Command should succeed when port is listening
         timeout="300s"
     )
     
