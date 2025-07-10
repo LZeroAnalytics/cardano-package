@@ -18,49 +18,41 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
     # Generate Cardano network configuration files
     config_files = _generate_cardano_config(plan, cardano_params)
     
-    # Launch Cardano node
+    # Launch Cardano node using cardanocommunity/cardano-node image format
     cardano_node_service = plan.add_service(
         name=constants.CARDANO_NODE_SERVICE,
         config=ServiceConfig(
             image=constants.CARDANO_NODE_IMAGE,
             ports={
                 "node": PortSpec(
-                    number=constants.CARDANO_NODE_PORT,
+                    number=6000,  # cardanocommunity image uses port 6000
                     transport_protocol="TCP"
                 ),
-                "submit-api": PortSpec(
-                    number=constants.CARDANO_SUBMIT_API_PORT,
+                "http": PortSpec(
+                    number=12798,  # HTTP monitoring port
                     transport_protocol="TCP"
                 )
             },
             files={
-                "/opt/cardano/config": config_files,
+                "/opt/cardano/cnode/priv/files": config_files,  # Expected path for cardanocommunity image
             },
-            cmd=[
-                "cardano-node", "run",
-                "--config", "/opt/cardano/config/config.json",
-                "--topology", "/opt/cardano/config/topology.json", 
-                "--database-path", "/opt/cardano/data",
-                "--socket-path", "/opt/cardano/ipc/socket",
-                "--host-addr", "0.0.0.0",
-                "--port", str(constants.CARDANO_NODE_PORT)
-            ],
             env_vars={
-                "CARDANO_NODE_SOCKET_PATH": constants.CARDANO_SOCKET_PATH
+                "NETWORK": cardano_params.network,  # Required by cardanocommunity image
+                "CARDANO_NODE_SOCKET_PATH": "/opt/cardano/cnode/sockets/node0.socket"
             }
         )
     )
     
-    # Wait for Cardano node to be ready
+    # Wait for Cardano node to be ready (check HTTP monitoring port)
     plan.wait(
         service_name=constants.CARDANO_NODE_SERVICE,
         recipe=GetHttpRequestRecipe(
-            port_id="submit-api",
-            endpoint="/api/submit/tx"
+            port_id="http",
+            endpoint="/"
         ),
         field="code",
         assertion="==",
-        target_value=405,  # Method not allowed is expected for GET on submit endpoint
+        target_value=200,  # HTTP monitoring should return 200
         timeout="300s"
     )
     
@@ -98,7 +90,7 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
         node_service=cardano_node_service,
         submit_api_service=submit_api_service,
         node_ip=cardano_node_service.ip_address,
-        node_port=constants.CARDANO_NODE_PORT,
+        node_port=6000,  # Updated to match cardanocommunity image
         submit_api_url="http://{}:{}".format(
             submit_api_service.ip_address, 
             8090

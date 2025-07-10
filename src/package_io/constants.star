@@ -31,15 +31,16 @@ PLUTUS_IMAGE = "plutus/plutus:latest"
 PLU_TS_IMAGE = "devin/plu-ts-node:latest"
 
 # Network ports
-CARDANO_NODE_PORT = 3001
+CARDANO_NODE_PORT = 6000  # cardanocommunity image uses port 6000
+CARDANO_HTTP_PORT = 12798  # HTTP monitoring port
 CARDANO_SUBMIT_API_PORT = 8090
 CARDANO_GRAPHQL_PORT = 3100
 CARDANO_EXPLORER_PORT = 3000
 
 # File paths
-CARDANO_CONFIG_PATH = "/opt/cardano/config"
-CARDANO_DATA_PATH = "/opt/cardano/data"
-CARDANO_SOCKET_PATH = "/opt/cardano/ipc/socket"
+CARDANO_CONFIG_PATH = "/opt/cardano/cnode/priv/files"  # Expected by cardanocommunity image
+CARDANO_DATA_PATH = "/opt/cardano/cnode/db"
+CARDANO_SOCKET_PATH = "/opt/cardano/cnode/sockets/node0.socket"
 
 # Default additional services
 DEFAULT_ADDITIONAL_SERVICES = [
