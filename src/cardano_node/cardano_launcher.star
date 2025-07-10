@@ -34,7 +34,7 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
                 )
             },
             files={
-                "/conf/testnet": config_files,  # Mount to conf/testnet as expected by cardanocommunity image
+                "/opt/cardano/cnode/files": config_files,  # Mount to files directory where cardano-node expects config.json
             },
             env_vars={
                 "NETWORK": cardano_params.network,  # Required by cardanocommunity image
