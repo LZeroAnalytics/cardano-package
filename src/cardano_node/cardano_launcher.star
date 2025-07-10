@@ -29,15 +29,15 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
                     transport_protocol="TCP"
                 ),
                 "http": PortSpec(
-                    number=12798,  # HTTP monitoring port
+                    number=17798,  # HTTP monitoring port used by cardanocommunity image
                     transport_protocol="TCP"
                 )
             },
             files={
-                "/opt/cardano/cnode/priv": config_files,  # Mount to priv directory as specified in Guild Operators documentation
+                "/opt/cardano/cnode/priv/files": config_files,  # Mount to files directory as expected by cardanocommunity image
             },
             env_vars={
-                "NETWORK": cardano_params.network,  # Required by cardanocommunity image
+                "NETWORK": "guild",  # Use guild network for custom configurations
                 "CARDANO_NODE_SOCKET_PATH": "/opt/cardano/cnode/sockets/node0.socket"
             }
         )
@@ -72,10 +72,10 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
             cmd=[
                 "cardano-submit-api",
                 "--config", "/opt/cardano/config/submit-api.json",
-                "--socket-path", "/opt/cardano/ipc/socket",
+                "--socket-path", "/opt/cardano/cnode/sockets/node0.socket",
                 "--port", "8090",
                 "--listen-address", "0.0.0.0",
-                "--testnet-magic", "1097911063"
+                "--testnet-magic", str(cardano_params.network_magic)
             ],
             env_vars={
                 "CARDANO_NODE_SOCKET_PATH": constants.CARDANO_SOCKET_PATH
@@ -98,7 +98,8 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
         socket_path=constants.CARDANO_SOCKET_PATH,
         network=cardano_params.network,
         network_magic=cardano_params.network_magic,
-        layerzero_config=layerzero_config
+        layerzero_config=layerzero_config,
+        config_artifact_name=config_files
     )
 
 def _generate_cardano_config(plan, cardano_params):
