@@ -1,0 +1,31 @@
+{
+  "EnableLogMetrics": false,
+  "EnableLogging": true,
+  "minSeverity": "Info",
+  "defaultBackends": [
+    "KatipBK"
+  ],
+  "defaultScribes": [
+    [
+      "StdoutSK",
+      "stdout"
+    ]
+  ],
+  "setupBackends": [
+    "KatipBK"
+  ],
+  "setupScribes": [
+    {
+      "scKind": "StdoutSK",
+      "scName": "stdout",
+      "scFormat": "ScText",
+      "scRotation": null
+    }
+  ],
+  "options": {
+    "mapBackends": {},
+    "mapSubtrace": {},
+    "mapSeverity": {},
+    "mapDetail": {}
+  }
+}
