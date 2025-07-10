@@ -38,7 +38,7 @@ CARDANO_GRAPHQL_PORT = 3100
 CARDANO_EXPLORER_PORT = 3000
 
 # File paths
-CARDANO_CONFIG_PATH = "/opt/cardano/cnode/files"  # Mount to files directory where cardano-node expects config.json
+CARDANO_CONFIG_PATH = "/opt/cardano/cnode/priv"  # Mount to priv directory as specified in Guild Operators documentation
 CARDANO_DATA_PATH = "/opt/cardano/cnode/db"
 CARDANO_SOCKET_PATH = "/opt/cardano/cnode/sockets/node0.socket"
 
