@@ -15,21 +15,10 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
     
     plan.print("Deploying LayerZero EndpointV2 contract to Cardano...")
     
-    # Upload only essential contract files (excluding node_modules)
-    contract_files = plan.upload_files(
-        src="contracts/",
-        name="endpoint-contract-files"
-    )
-    
-    # Upload package configuration files
-    package_files = plan.upload_files(
-        src="package.json",
-        name="endpoint-package-files"
-    )
-    
-    tsconfig_files = plan.upload_files(
-        src="tsconfig.json", 
-        name="endpoint-tsconfig-files"
+    # Upload the entire endpoint directory structure
+    endpoint_files = plan.upload_files(
+        src=".",
+        name="endpoint-files"
     )
     
     # Deploy contract using Cardano transaction
@@ -38,9 +27,7 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
         config=ServiceConfig(
             image=constants.PLU_TS_IMAGE,
             files={
-                "/contracts/contracts": contract_files,
-                "/contracts/package.json": package_files,
-                "/contracts/tsconfig.json": tsconfig_files,
+                "/contracts": endpoint_files,
             },
             cmd=[
                 "sh", "-c",
