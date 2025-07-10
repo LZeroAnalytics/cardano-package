@@ -21,14 +21,14 @@ EXECUTOR_SERVICE_PREFIX = "executor-service"
 CARDANO_EXPLORER_SERVICE = "cardano-explorer"
 
 # Container images
-CARDANO_NODE_IMAGE = "inputoutput/cardano-node:8.9.0"
+CARDANO_NODE_IMAGE = "cardanocommunity/cardano-node:latest"
 CARDANO_CLI_IMAGE = "inputoutput/cardano-cli:8.20.3"
 CARDANO_DB_SYNC_IMAGE = "inputoutput/cardano-db-sync:13.2.0.1"
 POSTGRES_IMAGE = "postgres:15"
 
 # plu-ts development images
 PLUTUS_IMAGE = "plutus/plutus:latest"
-PLU_TS_IMAGE = "harmoniclabs/plu-ts:latest"
+PLU_TS_IMAGE = "devin/plu-ts-node:latest"
 
 # Network ports
 CARDANO_NODE_PORT = 3001

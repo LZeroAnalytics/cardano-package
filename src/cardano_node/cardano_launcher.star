@@ -68,7 +68,7 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
     submit_api_service = plan.add_service(
         name="cardano-submit-api",
         config=ServiceConfig(
-            image="inputoutput/cardano-submit-api:latest",
+            image="apexpool/cardano-submit-api:latest",
             ports={
                 "api": PortSpec(
                     number=8090,
