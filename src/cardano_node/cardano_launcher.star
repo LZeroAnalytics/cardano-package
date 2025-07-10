@@ -34,7 +34,7 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
                 )
             },
             files={
-                "/opt/cardano/cnode/priv": config_files,  # Mount to priv directory as per Guild Operators docs
+                "/conf/testnet": config_files,  # Mount to conf/testnet as expected by cardanocommunity image
             },
             env_vars={
                 "NETWORK": cardano_params.network,  # Required by cardanocommunity image
