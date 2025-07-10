@@ -74,7 +74,8 @@ def launch_cardano_node(plan, cardano_params, layerzero_params):
                 "--config", "/opt/cardano/config/submit-api.json",
                 "--socket-path", "/opt/cardano/ipc/socket",
                 "--port", "8090",
-                "--listen-address", "0.0.0.0"
+                "--listen-address", "0.0.0.0",
+                "--testnet-magic", "1097911063"
             ],
             env_vars={
                 "CARDANO_NODE_SOCKET_PATH": constants.CARDANO_SOCKET_PATH
