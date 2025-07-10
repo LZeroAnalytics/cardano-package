@@ -125,9 +125,12 @@ def run(plan, args={}):
             endpoint_address
         )
     
-    # Launch Cardano Explorer (temporarily disabled due to Docker image availability)
-    explorer_context = None
-    plan.print("Cardano Explorer temporarily disabled - focusing on contract deployment verification")
+    # Launch Cardano Explorer
+    plan.print("Launching Cardano Explorer...")
+    explorer_context = cardano_explorer.launch_cardano_explorer(
+        plan,
+        cardano_context
+    )
     
     # Return deployment information
     return struct(
