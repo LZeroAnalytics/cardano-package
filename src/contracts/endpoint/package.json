@@ -10,7 +10,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@harmoniclabs/plu-ts": "^0.7.0"
+    "@harmoniclabs/plu-ts": "^0.7.0",
+    "@types/node": "^20.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

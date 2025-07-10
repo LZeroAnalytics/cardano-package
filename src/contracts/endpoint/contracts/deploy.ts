@@ -2,6 +2,7 @@ import {
     compiledEndpoint
 } from "./EndpointV2.js";
 import { writeFileSync } from 'fs';
+import * as process from 'process';
 
 export async function deployEndpoint(
     endpointId: string,
@@ -38,9 +39,9 @@ export async function deployEndpoint(
 
 async function main() {
     const args = process.argv.slice(2);
-    const endpointId = args.find(arg => arg.startsWith('--endpoint-id='))?.split('=')[1] || '30199';
-    const ownerAddress = args.find(arg => arg.startsWith('--owner='))?.split('=')[1] || '';
-    const network = args.find(arg => arg.startsWith('--network='))?.split('=')[1] || 'testnet';
+    const endpointId = args.find((arg: string) => arg.startsWith('--endpoint-id='))?.split('=')[1] || '30199';
+    const ownerAddress = args.find((arg: string) => arg.startsWith('--owner='))?.split('=')[1] || '';
+    const network = args.find((arg: string) => arg.startsWith('--network='))?.split('=')[1] || 'testnet';
     
     if (!ownerAddress) {
         console.error('Owner address is required. Use --owner=<address>');
