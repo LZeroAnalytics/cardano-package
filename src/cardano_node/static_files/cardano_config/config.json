@@ -1,17 +1,146 @@
 {
   "AlonzoGenesisFile": "alonzo-genesis.json",
-  "AlonzoGenesisHash": "7e94a15f55d1e82d10f09203fa04bd80b016838e2ed3f0b7e5b175a65c1a99a7",
-  "ByronGenesisFile": "byron-genesis.json", 
-  "ByronGenesisHash": "5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb",
+  "ApplicationName": "cardano-sl",
+  "ApplicationVersion": 0,
+  "ByronGenesisFile": "byron-genesis.json",
+  "ConsensusMode": "PraosMode",
   "ConwayGenesisFile": "conway-genesis.json",
-  "ConwayGenesisHash": "f28f1c1280ea0d32f8cd3143e268650d6c1a8e221522ce4a7d20d62fc09783b7",
-  "ShelleyGenesisFile": "shelley-genesis.json",
-  "ShelleyGenesisHash": "1a3be38bcbb7911969283716ad7aa550250226b76a61fc51cc9a9a35d9276d81",
+  "EnableP2P": true,
+  "ExperimentalHardForksEnabled": true,
+  "ExperimentalProtocolsEnabled": true,
+  "LastKnownBlockVersion-Alt": 0,
+  "LastKnownBlockVersion-Major": 3,
+  "LastKnownBlockVersion-Minor": 1,
+  "LedgerDB": {
+    "Backend": "V2InMemory",
+    "NumOfDiskSnapshots": 2,
+    "QueryBatchSize": 100000,
+    "SnapshotInterval": 216
+  },
+  "MaxConcurrencyDeadline": 4,
+  "MaxKnownMajorProtocolVersion": 2,
+  "PBftSignatureThreshold": 1.1,
   "Protocol": "Cardano",
   "RequiresNetworkMagic": "RequiresMagic",
-  "EnableLogMetrics": false,
-  "EnableLogging": true,
-  "hasEKG": 12788,
-  "hasPrometheus": ["127.0.0.1", 12798],
-  "minSeverity": "Info"
+  "ShelleyGenesisFile": "shelley-genesis.json",
+  "TestAllegraHardForkAtEpoch": 0,
+  "TestAlonzoHardForkAtEpoch": 0,
+  "TestMaryHardForkAtEpoch": 0,
+  "TestShelleyHardForkAtEpoch": 0,
+  "TraceOptionForwarder": {
+    "connQueueSize": 64,
+    "disconnQueueSize": 128,
+    "maxReconnectDelay": 30
+  },
+  "TraceOptionMetricsPrefix": "cardano.node.metrics.",
+  "TraceOptionPeerFrequency": 2000,
+  "TraceOptionResourceFrequency": 1000,
+  "TraceOptions": {
+    "": {
+      "backends": [
+        "EKGBackend",
+        "Forwarder",
+        "PrometheusSimple suffix 127.0.0.1 12798",
+        "Stdout HumanFormatColoured"
+      ],
+      "detail": "DNormal",
+      "severity": "Notice"
+    },
+    "BlockFetch.Client.CompletedBlockFetch": {
+      "maxFrequency": 2.0
+    },
+    "BlockFetch.Decision": {
+      "severity": "Silence"
+    },
+    "ChainDB": {
+      "severity": "Info"
+    },
+    "ChainDB.AddBlockEvent.AddBlockValidation": {
+      "severity": "Silence"
+    },
+    "ChainDB.AddBlockEvent.AddBlockValidation.ValidCandidate": {
+      "maxFrequency": 2.0
+    },
+    "ChainDB.AddBlockEvent.AddedBlockToQueue": {
+      "maxFrequency": 2.0
+    },
+    "ChainDB.AddBlockEvent.AddedBlockToVolatileDB": {
+      "maxFrequency": 2.0
+    },
+    "ChainDB.CopyToImmutableDBEvent.CopiedBlockToImmutableDB": {
+      "maxFrequency": 2.0
+    },
+    "ChainDB.LedgerEvent.Forker": {
+      "severity": "Silence"
+    },
+    "ChainSync.Client": {
+      "severity": "Warning"
+    },
+    "Forge.Loop": {
+      "severity": "Info"
+    },
+    "Forge.StateInfo": {
+      "severity": "Info"
+    },
+    "Mempool": {
+      "severity": "Info"
+    },
+    "Mempool.AttemptAdd": {
+      "severity": "Silence"
+    },
+    "Mempool.LedgerFound": {
+      "severity": "Silence"
+    },
+    "Mempool.LedgerNotFound": {
+      "severity": "Silence"
+    },
+    "Mempool.SyncNotNeeded": {
+      "severity": "Silence"
+    },
+    "Net.ConnectionManager.Remote": {
+      "severity": "Info"
+    },
+    "Net.ConnectionManager.Remote.ConnectionManagerCounters": {
+      "severity": "Silence"
+    },
+    "Net.ErrorPolicy": {
+      "severity": "Info"
+    },
+    "Net.ErrorPolicy.Local": {
+      "severity": "Info"
+    },
+    "Net.InboundGovernor": {
+      "severity": "Warning"
+    },
+    "Net.InboundGovernor.Remote": {
+      "severity": "Info"
+    },
+    "Net.Mux.Remote": {
+      "severity": "Info"
+    },
+    "Net.PeerSelection": {
+      "severity": "Silence"
+    },
+    "Net.Subscription.DNS": {
+      "severity": "Info"
+    },
+    "Net.Subscription.IP": {
+      "severity": "Info"
+    },
+    "Resources": {
+      "severity": "Silence"
+    },
+    "Startup.DiffusionInit": {
+      "severity": "Info"
+    }
+  },
+  "TurnOnLogMetrics": true,
+  "TurnOnLogging": true,
+  "UseTraceDispatcher": true,
+  "defaultBackends": [],
+  "defaultScribes": [],
+  "minSeverity": "Critical",
+  "options": {},
+  "setupBackends": [],
+  "setupScribes": []
 }
