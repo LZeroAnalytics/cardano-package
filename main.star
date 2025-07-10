@@ -125,14 +125,9 @@ def run(plan, args={}):
             endpoint_address
         )
     
-    # Launch Cardano Explorer if requested
+    # Launch Cardano Explorer (temporarily disabled due to Docker image availability)
     explorer_context = None
-    if "cardano_explorer" in config.additional_services:
-        plan.print("Launching Cardano Explorer...")
-        explorer_context = cardano_explorer.launch_cardano_explorer(
-            plan,
-            cardano_context
-        )
+    plan.print("Cardano Explorer temporarily disabled - focusing on contract deployment verification")
     
     # Return deployment information
     return struct(

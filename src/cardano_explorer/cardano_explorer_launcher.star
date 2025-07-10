@@ -53,18 +53,23 @@ def launch_cardano_explorer(plan, cardano_context):
             env_vars={
                 "POSTGRES_HOST": postgres_service.ip_address,
                 "POSTGRES_PORT": "5432",
-                "POSTGRES_DB": "cexplorer", 
+                "POSTGRES_DB": "cexplorer",
                 "POSTGRES_USER": "cardano",
+                "POSTGRES_PASSWORD": "",
                 "CARDANO_NODE_SOCKET_PATH": cardano_context.socket_path,
-                "CARDANO_NODE_CONFIG_PATH": "/opt/cardano/config/config.json"
+                "CARDANO_NODE_CONFIG_PATH": "/opt/cardano/config/config.json",
+                "NETWORK": "custom"
             },
             cmd=[
                 "cardano-db-sync",
-                "--config", "/opt/cardano/config/db-sync-config.json",
+                "--config", "/opt/cardano/config/config.json",
                 "--socket-path", cardano_context.socket_path,
                 "--state-dir", "/opt/cardano/data",
                 "--schema-dir", "/opt/cardano/schema"
-            ]
+            ],
+            files={
+                "/opt/cardano/config": cardano_context.config_artifact_name
+            }
         )
     )
     
@@ -72,7 +77,7 @@ def launch_cardano_explorer(plan, cardano_context):
     graphql_service = plan.add_service(
         name="cardano-graphql",
         config=ServiceConfig(
-            image="cardanofoundation/cardano-graphql:7.0.0",
+            image="inputoutput/cardano-graphql:8.0.0",
             ports={
                 "graphql": PortSpec(
                     number=constants.CARDANO_GRAPHQL_PORT,
@@ -84,8 +89,12 @@ def launch_cardano_explorer(plan, cardano_context):
                 "POSTGRES_PORT": "5432",
                 "POSTGRES_DB": "cexplorer",
                 "POSTGRES_USER": "cardano",
+                "POSTGRES_PASSWORD": "",
                 "CARDANO_NODE_CONFIG_PATH": "/opt/cardano/config/config.json",
                 "HASURA_URI": "http://localhost:8080/v1/graphql"
+            },
+            files={
+                "/opt/cardano/config": cardano_context.config_artifact_name
             }
         )
     )
@@ -94,7 +103,7 @@ def launch_cardano_explorer(plan, cardano_context):
     explorer_frontend_service = plan.add_service(
         name=constants.CARDANO_EXPLORER_SERVICE,
         config=ServiceConfig(
-            image="cardanofoundation/cardano-explorer-app:latest",
+            image="inputoutput/cardano-explorer:latest",
             ports={
                 "frontend": PortSpec(
                     number=constants.CARDANO_EXPLORER_PORT,
