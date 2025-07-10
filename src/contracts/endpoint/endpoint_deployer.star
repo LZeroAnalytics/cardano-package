@@ -17,7 +17,7 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
     
     # Upload specific contract files, excluding node_modules
     contract_files = plan.upload_files(
-        src="src/contracts/endpoint",
+        src="src/contracts/endpoint/",
         name="endpoint-contract-files"
     )
     
