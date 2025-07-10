@@ -17,7 +17,7 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
     
     # Upload all contract files including package.json and tsconfig.json together
     contract_files = plan.upload_files(
-        src="src/contracts/endpoint/",
+        src=".",
         name="endpoint-contract-files"
     )
     
@@ -31,7 +31,7 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
             },
             cmd=[
                 "sh", "-c",
-                "cd /contracts && npm install && npm run build && node dist/contracts/deploy.js --endpoint-id={} --network={} --owner=addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw".format(
+                "cd /contracts/src/contracts/endpoint && npm install && npm run build && node dist/contracts/deploy.js --endpoint-id={} --network={} --owner=addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw".format(
                     endpoint_id,
                     cardano_context.network
                 )
