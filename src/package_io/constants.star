@@ -28,7 +28,7 @@ POSTGRES_IMAGE = "postgres:15"
 
 # plu-ts development images
 PLUTUS_IMAGE = "plutus/plutus:latest"
-PLU_TS_IMAGE = "devin/plu-ts-node:latest"
+PLU_TS_IMAGE = "tiljordan/plu-ts-node:1.0.0"
 
 # Network ports
 CARDANO_NODE_PORT = 6000  # cardanocommunity image uses port 6000
