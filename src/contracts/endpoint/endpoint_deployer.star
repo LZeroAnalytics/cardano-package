@@ -56,14 +56,24 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
         timeout="300s"
     )
     
-    # Get deployed contract address from the deployment service logs
-    deployment_logs = plan.run_sh(
-        name="get-endpoint-address",
-        description="Extract endpoint address from deployment logs",
-        image="alpine:latest",
-        run="echo 'addr_test1qzatj97k59rqn'"  # Mock address for now - in real implementation would parse from logs
+    # Get deployed contract address from the deployment service
+    deployment_address = plan.exec(
+        service_name="endpoint-deployer",
+        recipe=ExecRecipe(
+            command=["cat", "/tmp/endpoint-address.txt"]
+        )
     )
     
-    plan.print("EndpointV2 deployed at address: {}".format(deployment_logs.output))
+    # Get deployment details
+    deployment_details = plan.exec(
+        service_name="endpoint-deployer",
+        recipe=ExecRecipe(
+            command=["cat", "/tmp/endpoint-deployment.json"]
+        )
+    )
     
-    return deployment_logs.output.strip()
+    plan.print("EndpointV2 deployed successfully!")
+    plan.print("Contract address: {}".format(deployment_address["output"].strip()))
+    plan.print("Deployment details: {}".format(deployment_details["output"]))
+    
+    return deployment_address["output"].strip()

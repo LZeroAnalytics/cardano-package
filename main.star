@@ -1,4 +1,6 @@
 cardano_node = import_module("./src/cardano_node/cardano_launcher.star")
+cardano_explorer = import_module("./src/cardano_explorer/cardano_explorer_launcher.star")
+wallet_manager = import_module("./src/wallet/wallet_manager.star")
 endpoint_deployer = import_module("./src/contracts/endpoint/endpoint_deployer.star")
 messagelib_deployer = import_module("./src/contracts/messagelib/messagelib_deployer.star")
 dvn_contract_deployer = import_module("./src/contracts/dvn/dvn_deployer.star")
@@ -28,6 +30,14 @@ def run(plan, args={}):
         plan,
         config.cardano_params,
         config.layerzero_params
+    )
+    
+    # Create funded wallet for contract deployment
+    plan.print("Creating funded wallet for contract deployment...")
+    wallet_context = wallet_manager.create_funded_wallet(
+        plan,
+        cardano_context,
+        "100000000000"  # 100 ADA
     )
     
     # Deploy LayerZero core contracts to Cardano
@@ -115,9 +125,19 @@ def run(plan, args={}):
             endpoint_address
         )
     
+    # Launch Cardano Explorer if requested
+    explorer_context = None
+    if "cardano_explorer" in config.additional_services:
+        plan.print("Launching Cardano Explorer...")
+        explorer_context = cardano_explorer.launch_cardano_explorer(
+            plan,
+            cardano_context
+        )
+    
     # Return deployment information
     return struct(
         cardano_context=cardano_context,
+        wallet_context=wallet_context,
         contracts=struct(
             endpoint=endpoint_address,
             messagelib=messagelib_address,
@@ -128,5 +148,6 @@ def run(plan, args={}):
         redis_urls=struct(
             dvn=dvn_redis_url,
             executor=executor_redis_url
-        )
+        ),
+        explorer_context=explorer_context
     )

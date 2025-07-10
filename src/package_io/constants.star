@@ -22,13 +22,13 @@ CARDANO_EXPLORER_SERVICE = "cardano-explorer"
 
 # Container images
 CARDANO_NODE_IMAGE = "cardanocommunity/cardano-node:latest"
-CARDANO_CLI_IMAGE = "inputoutput/cardano-cli:8.20.3"
-CARDANO_DB_SYNC_IMAGE = "inputoutput/cardano-db-sync:13.2.0.1"
+CARDANO_CLI_IMAGE = "cardanocommunity/cardano-node:latest"  # Use same image as node for CLI
+CARDANO_DB_SYNC_IMAGE = "cardanocommunity/cardano-db-sync:latest"
 POSTGRES_IMAGE = "postgres:15"
 
 # plu-ts development images
 PLUTUS_IMAGE = "plutus/plutus:latest"
-PLU_TS_IMAGE = "tiljordan/plu-ts-node:1.0.0"
+PLU_TS_IMAGE = "node:18-alpine"  # Use standard Node.js image for plu-ts
 
 # Network ports
 CARDANO_NODE_PORT = 6000  # cardanocommunity image uses port 6000
