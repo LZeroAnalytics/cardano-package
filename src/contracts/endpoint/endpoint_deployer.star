@@ -15,9 +15,9 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
     
     plan.print("Deploying LayerZero EndpointV2 contract to Cardano...")
     
-    # Upload all contract files including package.json and tsconfig.json together
+    # Upload specific contract files, excluding node_modules
     contract_files = plan.upload_files(
-        src=".",
+        src="src/contracts/endpoint",
         name="endpoint-contract-files"
     )
     
@@ -31,7 +31,7 @@ def deploy_endpoint(plan, cardano_context, endpoint_id):
             },
             cmd=[
                 "sh", "-c",
-                "cd /contracts/src/contracts/endpoint && npm install && npm run build && node dist/contracts/deploy.js --endpoint-id={} --network={} --owner=addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw".format(
+                "cd /contracts && npm install && npm run build && node dist/contracts/deploy.js --endpoint-id={} --network={} --owner=addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw".format(
                     endpoint_id,
                     cardano_context.network
                 )
