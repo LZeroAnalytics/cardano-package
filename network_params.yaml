@@ -24,10 +24,7 @@ layerzero_params:
 
 connections: []
 
-additional_services:
-  - cardano_explorer  # Cardano blockchain explorer
-  - dvn_service      # Data Verification Network service
-  - executor_service # Message execution service
+additional_services: []  # Temporarily disable explorer to focus on core chain functionality
 
 log_level: "info"
 
@@ -36,14 +33,6 @@ resource_limits:
     cpu: "2000m"      # 2 CPU cores
     memory: "4Gi"     # 4GB RAM
     storage: "100Gi"  # 100GB storage
-  
-  dvn_service:
-    cpu: "500m"       # 0.5 CPU cores
-    memory: "1Gi"     # 1GB RAM
-  
-  executor_service:
-    cpu: "500m"       # 0.5 CPU cores
-    memory: "1Gi"     # 1GB RAM
 
 dev_mode:
   enabled: false
