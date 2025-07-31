@@ -5,9 +5,11 @@ import { writeFileSync } from 'node:fs';
 import { argv, exit, env } from 'node:process';
 import { 
     Address, 
-    PCredential, 
+    PaymentCredentials, 
     Script, 
-    ScriptType
+    ScriptType,
+    TxBuilder,
+    Value
 } from "@harmoniclabs/plu-ts";
 import { execSync } from 'node:child_process';
 
@@ -32,7 +34,7 @@ export async function deployEndpoint(
         
         const scriptHash = script.hash.toString();
         const scriptAddress = Address.testnet(
-            PCredential.script(script.hash)
+            PaymentCredentials.script(script.hash)
         ).toString();
         
         console.log('Building EndpointV2 contract deployment transaction...');
@@ -43,17 +45,7 @@ export async function deployEndpoint(
         
         const scriptCbor = script.toCbor().toString();
         console.log(`Script CBOR: ${scriptCbor.substring(0, 100)}...`);
-        
-        const deploymentTx = {
-            type: "Tx BabbageEra",
-            description: "LayerZero EndpointV2 Contract Deployment",
-            cborHex: scriptCbor,
-            testnetMagic: testnetMagic
-        };
-        
-        const cborHex = JSON.stringify(deploymentTx);
-        console.log(`Generated CBOR hex: ${cborHex.substring(0, 100)}...`);
-        console.log(`CBOR length: ${cborHex.length} characters`);
+        console.log(`CBOR length: ${scriptCbor.length} characters`);
         
         console.log('Submitting contract deployment transaction...');
         const response = await fetch(`${submitApiUrl}/api/submit/tx`, {
@@ -61,7 +53,7 @@ export async function deployEndpoint(
             headers: {
                 'Content-Type': 'application/cbor',
             },
-            body: cborHex
+            body: scriptCbor
         });
         
         if (!response.ok) {

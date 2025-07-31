@@ -77,7 +77,7 @@ def launch_cardano_explorer(plan, cardano_context):
     graphql_service = plan.add_service(
         name="cardano-graphql",
         config=ServiceConfig(
-            image="inputoutput/cardano-graphql:8.0.0",
+            image=constants.CARDANO_GRAPHQL_IMAGE,
             ports={
                 "graphql": PortSpec(
                     number=constants.CARDANO_GRAPHQL_PORT,
@@ -103,7 +103,7 @@ def launch_cardano_explorer(plan, cardano_context):
     explorer_frontend_service = plan.add_service(
         name=constants.CARDANO_EXPLORER_SERVICE,
         config=ServiceConfig(
-            image="inputoutput/cardano-explorer:latest",
+            image=constants.CARDANO_EXPLORER_IMAGE,
             ports={
                 "frontend": PortSpec(
                     number=constants.CARDANO_EXPLORER_PORT,
@@ -129,7 +129,7 @@ def launch_cardano_explorer(plan, cardano_context):
         field="code",
         assertion="==",
         target_value=0,
-        timeout="120s"
+        timeout="60s"
     )
     
     plan.print("Cardano Explorer launched successfully!")

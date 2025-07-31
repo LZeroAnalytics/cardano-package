@@ -23,8 +23,12 @@ CARDANO_EXPLORER_SERVICE = "cardano-explorer"
 # Container images
 CARDANO_NODE_IMAGE = "cardanocommunity/cardano-node:latest"
 CARDANO_CLI_IMAGE = "cardanocommunity/cardano-node:latest"  # Use same image as node for CLI
-CARDANO_DB_SYNC_IMAGE = "inputoutput/cardano-db-sync:13.2.0.1"
+CARDANO_DB_SYNC_IMAGE = "cloudstruct/cardano-db-sync:latest"
 POSTGRES_IMAGE = "postgres:15"
+
+# Block explorer images
+CARDANO_GRAPHQL_IMAGE = "inputoutput/cardano-graphql:8.0.0"
+CARDANO_EXPLORER_IMAGE = "planetcardano/cardano-explorer:latest"
 
 # plu-ts development images
 PLUTUS_IMAGE = "plutus/plutus:latest"
