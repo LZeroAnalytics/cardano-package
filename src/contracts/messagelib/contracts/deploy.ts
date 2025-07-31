@@ -5,9 +5,11 @@ import { writeFileSync } from 'node:fs';
 import { argv, exit, env } from 'node:process';
 import { 
     Address, 
-    PCredential, 
+    PaymentCredentials, 
     Script, 
-    ScriptType
+    ScriptType,
+    TxBuilder,
+    Value
 } from "@harmoniclabs/plu-ts";
 
 export async function deployMessageLib(
@@ -29,7 +31,7 @@ export async function deployMessageLib(
         
         const scriptHash = script.hash.toString();
         const scriptAddress = Address.testnet(
-            PCredential.script(script.hash)
+            PaymentCredentials.script(script.hash)
         ).toString();
         
         console.log('Building MessageLib contract deployment transaction...');
@@ -43,25 +45,15 @@ export async function deployMessageLib(
         
         const scriptCbor = script.toCbor().toString();
         console.log(`Script CBOR: ${scriptCbor.substring(0, 100)}...`);
-        
-        const deploymentTx = {
-            type: "Tx BabbageEra",
-            description: "LayerZero MessageLib Contract Deployment",
-            cborHex: scriptCbor,
-            testnetMagic: testnetMagic
-        };
-        
-        const cborHex = JSON.stringify(deploymentTx);
+        console.log(`CBOR length: ${scriptCbor.length} characters`);
         
         console.log('Submitting contract deployment transaction...');
-        console.log(`CBOR length: ${cborHex.length} characters`);
-        
         const response = await fetch(`${submitApiUrl}/api/submit/tx`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/cbor',
             },
-            body: cborHex
+            body: scriptCbor
         });
         
         if (!response.ok) {
