@@ -23,11 +23,11 @@ cardano-cli address key-gen --verification-key-file /tmp/recv.vkey --signing-key
 cardano-cli address build --payment-verification-key-file /tmp/recv.vkey --testnet-magic ${NETWORK_MAGIC} --out-file /tmp/recv.addr && \
 cat /tmp/recv.addr; fi`);
 
-  const utxos = runInWallet(\`cardano-cli query utxo --address \${WALLET_ADDRESS} --testnet-magic \${NETWORK_MAGIC}\`);
+  const utxos = runInWallet(`cardano-cli query utxo --address ${WALLET_ADDRESS} --testnet-magic ${NETWORK_MAGIC}`);
   const lines = utxos.split("\\n").slice(2).filter(Boolean);
   if (lines.length === 0) throw new Error("No UTXO available on the funding address. Fund it via the preprod faucet first.");
   const [txHash, txIx] = lines[0].split(/\\s+/);
-  const txIn = \`\${txHash}#\${txIx}\`;
+  const txIn = `${txHash}#${txIx}`;
 
   runInWallet(\`cardano-cli transaction build --testnet-magic \${NETWORK_MAGIC} --tx-in \${txIn} --tx-out "\${recvAddr}+1000000" --change-address \${WALLET_ADDRESS} --out-file /tmp/send-ada.raw\`);
   runInWallet(\`cardano-cli transaction sign --tx-body-file /tmp/send-ada.raw --signing-key-file \${SIGNING_KEY_PATH} --testnet-magic \${NETWORK_MAGIC} --out-file /tmp/send-ada.signed\`);

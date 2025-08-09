@@ -26,11 +26,11 @@ async function main() {
 }
 EOF`);
 
-  const utxos = runInWallet(\`cardano-cli query utxo --address \${WALLET_ADDRESS} --testnet-magic \${NETWORK_MAGIC}\`);
+  const utxos = runInWallet(`cardano-cli query utxo --address ${WALLET_ADDRESS} --testnet-magic ${NETWORK_MAGIC}`);
   const lines = utxos.split("\\n").slice(2).filter(Boolean);
   if (lines.length === 0) throw new Error("No UTXO available on the funding address. Fund it via the preprod faucet first.");
   const [txHash, txIx] = lines[0].split(/\\s+/);
-  const txIn = \`\${txHash}#\${txIx}\`;
+  const txIn = `${txHash}#${txIx}`;
 
   runInWallet(\`echo "\${WALLET_ADDRESS}" > /tmp/change.addr\`);
 
