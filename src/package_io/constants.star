@@ -18,7 +18,7 @@ CARDANO_CLI_IMAGE = "cardanocommunity/cardano-node:latest"
 # Explorer/indexer images
 OGMIOS_IMAGE = "cardanosolutions/ogmios:latest"
 KUPO_IMAGE = "cardanosolutions/kupo:latest"
-YACI_STORE_IMAGE = "bloxbean/yaci-store:latest"
+YACI_STORE_IMAGE = "bloxbean/yaci-store:2.0.0-beta3"
 YACI_VIEWER_IMAGE = "bloxbean/yaci-viewer:latest"
 
 # Network ports
