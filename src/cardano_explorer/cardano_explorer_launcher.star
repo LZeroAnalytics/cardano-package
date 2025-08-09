@@ -46,7 +46,7 @@ def launch_cardano_explorer(plan, cardano_context):
                 "KUPO_URL": "http://{}:{}".format(kupo.ip_address, 1442),
                 "SPRING_PROFILES_ACTIVE": "ogmios,kupo",
                 "store.cardano.network": "preprod",
-                "store.cardano.byron-genesis-file": "/opt/cardano/config/byron-genesis.json",
+                "store.cardano.has-byron": "false",
                 "store.cardano.shelley-genesis-file": "/opt/cardano/config/shelley-genesis.json",
                 "store.cardano.alonzo-genesis-file": "/opt/cardano/config/alonzo-genesis.json",
                 "store.cardano.conway-genesis-file": "/opt/cardano/config/conway-genesis.json"
