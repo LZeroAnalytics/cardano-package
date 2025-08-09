@@ -4,7 +4,7 @@ export type TxCbor = string;
 
 export async function submitTxOgmios(ogmiosUrl: string, txCbor: TxCbor): Promise<string> {
   const url = ogmiosUrl.replace(/^http/, "ws");
-  const ws = new WebSocket(`${url}`);
+  const ws = new WebSocket(url);
   const request = {
     type: "jsonwsp/request",
     version: "1.0",
@@ -31,7 +31,7 @@ export async function submitTxOgmios(ogmiosUrl: string, txCbor: TxCbor): Promise
           resolve(txId);
         } else if (msg.result && msg.result[0] && msg.result[0].Reject) {
           ws.close();
-          reject(new Error(\`Tx rejected: \${JSON.stringify(msg.result[0].Reject)}\`));
+          reject(new Error("Tx rejected: " + JSON.stringify(msg.result[0].Reject)));
         }
       } catch (e) {
       }
