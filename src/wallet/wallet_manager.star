@@ -44,11 +44,7 @@ def create_funded_wallet(plan, cardano_context, initial_funds="100000000000"):
                 """
             ],
             env_vars={
-                "CARDANO_NETWORK": cardano_context.network,
-                "CARDANO_NODE_SOCKET_PATH": cardano_context.socket_path
-            },
-            files={
-                "/opt/cardano/config": cardano_context.config_artifact_name
+                "CARDANO_NETWORK": cardano_context.network
             }
         )
     )
@@ -85,7 +81,7 @@ def create_funded_wallet(plan, cardano_context, initial_funds="100000000000"):
                 "-c", """
                 # Wait for Cardano node to be ready
                 echo "Waiting for Cardano node to be ready..."
-                while ! cardano-cli query tip --testnet-magic 1097911063 --socket-path $CARDANO_NODE_SOCKET_PATH 2>/dev/null; do
+                while ! cardano-cli query tip --testnet-magic 1097911063 2>/dev/null; do
                     echo "Node not ready, waiting..."
                     sleep 5
                 done
@@ -108,8 +104,8 @@ def create_funded_wallet(plan, cardano_context, initial_funds="100000000000"):
                 
                 # Query UTXOs from genesis addresses
                 echo "Querying genesis UTXOs..."
-                cardano-cli query utxo --address $GENESIS_ADDR1 --testnet-magic 1097911063 --socket-path $CARDANO_NODE_SOCKET_PATH > /tmp/genesis-utxos1.txt
-                cardano-cli query utxo --address $GENESIS_ADDR2 --testnet-magic 1097911063 --socket-path $CARDANO_NODE_SOCKET_PATH > /tmp/genesis-utxos2.txt
+                cardano-cli query utxo --address $GENESIS_ADDR1 --testnet-magic 1097911063 > /tmp/genesis-utxos1.txt
+                cardano-cli query utxo --address $GENESIS_ADDR2 --testnet-magic 1097911063 > /tmp/genesis-utxos2.txt
                 
                 # Extract first UTXO from genesis address 1 (skip header lines)
                 GENESIS_UTXO=$(tail -n +3 /tmp/genesis-utxos1.txt | head -n 1 | awk '{print $1"#"$2}')
@@ -125,7 +121,6 @@ def create_funded_wallet(plan, cardano_context, initial_funds="100000000000"):
                 # Create funding transaction from genesis UTXO to new wallet
                 cardano-cli transaction build \
                     --testnet-magic 1097911063 \
-                    --socket-path $CARDANO_NODE_SOCKET_PATH \
                     --tx-in $GENESIS_UTXO \
                     --tx-out "$WALLET_ADDRESS+$INITIAL_FUNDS" \
                     --change-address $GENESIS_ADDR1 \
@@ -148,8 +143,7 @@ def create_funded_wallet(plan, cardano_context, initial_funds="100000000000"):
                         cardano-cli transaction submit \
                             --tx-file /tmp/funding-tx.signed \
                             --testnet-magic 1097911063 \
-                            --socket-path $CARDANO_NODE_SOCKET_PATH
-                        
+                            
                         if [ $? -eq 0 ]; then
                             echo "Wallet funding transaction submitted successfully!"
                             echo "funded" > /tmp/funding-status.txt
@@ -171,11 +165,7 @@ def create_funded_wallet(plan, cardano_context, initial_funds="100000000000"):
                 """
             ],
             env_vars={
-                "CARDANO_NODE_SOCKET_PATH": cardano_context.socket_path,
                 "INITIAL_FUNDS": initial_funds
-            },
-            files={
-                "/opt/cardano/config": cardano_context.config_artifact_name
             }
         )
     )
