@@ -13,6 +13,10 @@ def launch_cardano_node(plan, cardano_params):
                 "ogmios": PortSpec(
                     number=1337,
                     transport_protocol="TCP"
+                ),
+                "n2n": PortSpec(
+                    number=3001,
+                    transport_protocol="TCP"
                 )
             }
         )
