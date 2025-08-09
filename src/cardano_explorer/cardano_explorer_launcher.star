@@ -44,13 +44,8 @@ def launch_cardano_explorer(plan, cardano_context):
             env_vars={
                 "SPRING_PROFILES_ACTIVE": "ogmios,kupo",
                 "STORE_CARDANO_NETWORK": "preprod",
-                "STORE_CARDANO_PROTOCOL_MAGIC": "1",
-                "STORE_CARDANO_HASBYRON": "false",
                 "STORE_CARDANO_OGMIOS_URL": "http://{}:{}".format(cardano_context.node_ip, 1337),
-                "STORE_CARDANO_KUPO_URL": "http://{}:{}".format(kupo.ip_address, 1442),
-                "STORE_CARDANO_SHELLEY_GENESIS_FILE": "/opt/cardano/config/shelley-genesis.json",
-                "STORE_CARDANO_ALONZO_GENESIS_FILE": "/opt/cardano/config/alonzo-genesis.json",
-                "STORE_CARDANO_CONWAY_GENESIS_FILE": "/opt/cardano/config/conway-genesis.json"
+                "STORE_CARDANO_KUPO_URL": "http://{}:{}".format(kupo.ip_address, 1442)
             }
         )
     )
