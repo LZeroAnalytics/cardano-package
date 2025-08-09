@@ -5,14 +5,17 @@ def parse_cardano_config(plan, args):
     additional_services = args.get("additional_services", constants.DEFAULT_ADDITIONAL_SERVICES)
     log_level = args.get("log_level", "info")
     dev_mode = args.get("dev_mode", {"enabled": False})
+    prefunded_accounts = args.get("prefunded_accounts", [])
 
     _validate_config(plan, cardano_params)
+    _validate_prefunds(plan, prefunded_accounts)
 
     return struct(
         cardano_params=cardano_params,
         additional_services=additional_services,
         log_level=log_level,
-        dev_mode=dev_mode
+        dev_mode=dev_mode,
+        prefunded_accounts=prefunded_accounts
     )
 
 def _parse_cardano_params(params):
@@ -32,3 +35,8 @@ def _validate_config(plan, cardano_params):
             cardano_params.network, valid_networks
         ))
     plan.print("Configuration validation passed")
+
+def _validate_prefunds(plan, accounts):
+    for i, a in enumerate(accounts):
+        if "address" not in a or "amount" not in a:
+            fail("prefunded_accounts[{}] must have 'address' and 'amount'".format(i))

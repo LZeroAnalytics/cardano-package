@@ -1,23 +1,26 @@
-Example scripts (TypeScript) using Ogmios tx-submission.
+Cardano Examples
 
-Prereqs:
-- Node.js 18+
-- pnpm (or npm/yarn)
-- Kurtosis package running; find the Ogmios mapped port via: `kurtosis enclave inspect cardano-local` (service `cardano-node` port 1337 maps to localhost)
+Environment
 
-Setup:
-- cd examples
-- pnpm install
-- Create .env with:
-  OGMIOS_URL=http://127.0.0.1:<mapped_port>
-  NETWORK_MAGIC=1097911063
-  WALLET_ADDRESS=<prefunded_address_from_run_output>
-  SIGNING_KEY_PATH=/tmp/payment.skey
+- Copy .env.example to .env and set:
+  - OGMIOS_URL=http://127.0.0.1:&lt;mapped_ogmios_port&gt;
+  - KUPO_URL=http://127.0.0.1:&lt;mapped_kupo_port&gt;
+  - NETWORK_MAGIC=1097911063
+  - WALLET_ADDRESS=&lt;funded address&gt;
+  - SIGNING_KEY_PATH=/tmp/payment.skey
 
-Send ADA:
-- pnpm run send-ada
+Funding
 
-Deploy simple Plutus script:
-- pnpm run deploy-plutus
+- Prefer specifying prefunded_accounts in the package args so WALLET_ADDRESS has UTxOs at genesis.
 
-These scripts build transactions with cardano-cli and submit via Ogmios SubmitTx over WebSocket (no Submit API).
+Run
+
+pnpm install
+pnpm run send-ada
+pnpm run deploy-plutus
+
+Implementation
+
+- UTxOs are queried via Kupo HTTP.
+- Protocol parameters are queried via Ogmios JSON-WSP.
+- Transactions are built and signed client-side and submitted via Ogmios.

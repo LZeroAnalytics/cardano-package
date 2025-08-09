@@ -1,14 +1,17 @@
 import 'dotenv/config';
 import { execSync } from "child_process";
 import { submitTxOgmios } from "./ogmios";
+import { getAddressUtxos } from "./kupo";
+import { queryCurrentProtocolParameters } from "./ogmios_query";
+import * as CSL from "@emurgo/cardano-serialization-lib-nodejs";
 
 const OGMIOS_URL = process.env.OGMIOS_URL || "http://localhost:1337";
-const NETWORK_MAGIC = process.env.NETWORK_MAGIC || "1097911063";
+const NETWORK_MAGIC = Number(process.env.NETWORK_MAGIC || "1097911063");
 const WALLET_ADDRESS = process.env.WALLET_ADDRESS || "";
 const SIGNING_KEY_PATH = process.env.SIGNING_KEY_PATH || "/tmp/payment.skey";
 
 function runInWallet(cmd: string): string {
-  const full = `kurtosis service exec cardano-local wallet-generator -- bash -lc '${cmd}'`;
+  const full = `kurtosis service exec cardano-local wallet-generator "bash -lc '${cmd}'"`;
   return execSync(full, { stdio: ["ignore", "pipe", "inherit"] }).toString().trim();
 }
 
@@ -23,18 +26,49 @@ cardano-cli address key-gen --verification-key-file /tmp/recv.vkey --signing-key
 cardano-cli address build --payment-verification-key-file /tmp/recv.vkey --testnet-magic ${NETWORK_MAGIC} --out-file /tmp/recv.addr && \
 cat /tmp/recv.addr; fi`);
 
-  const utxos = runInWallet(`cardano-cli query utxo --address ${WALLET_ADDRESS} --testnet-magic ${NETWORK_MAGIC}`);
-  const lines = utxos.split("\\n").slice(2).filter(Boolean);
-  if (lines.length === 0) throw new Error("No UTXO available on the funding address. Fund it via the preprod faucet first.");
-  const [txHash, txIx] = lines[0].split(/\\s+/);
-  const txIn = `${txHash}#${txIx}`;
+  const utxos = await getAddressUtxos(WALLET_ADDRESS);
+  if (utxos.length === 0) throw new Error("No UTXO available on the funding address. Fund it first.");
+  const first = utxos[0];
 
-  runInWallet(`cardano-cli transaction build --testnet-magic ${NETWORK_MAGIC} --tx-in ${txIn} --tx-out "${recvAddr}+1000000" --change-address ${WALLET_ADDRESS} --out-file /tmp/send-ada.raw`);
-  runInWallet(`cardano-cli transaction sign --tx-body-file /tmp/send-ada.raw --signing-key-file ${SIGNING_KEY_PATH} --testnet-magic ${NETWORK_MAGIC} --out-file /tmp/send-ada.signed`);
+  const protocolParams = await queryCurrentProtocolParameters(OGMIOS_URL);
 
-  const cborHex = runInWallet("xxd -p -c 100000 /tmp/send-ada.signed | tr -d '\\n'");
+  const txBuilderCfg = CSL.TransactionBuilderConfigBuilder.new()
+    .fee_algo(
+      CSL.LinearFee.new(
+        CSL.BigNum.from_str(String(protocolParams.minFeeA || protocolParams.minFeeCoefficient || "44")),
+        CSL.BigNum.from_str(String(protocolParams.minFeeB || protocolParams.minFeeConstant || "155381"))
+      )
+    )
+    .coins_per_utxo_byte(CSL.BigNum.from_str(String(protocolParams.coinsPerUtxoByte || "4310")))
+    .max_tx_size(protocolParams.maxTxSize || 16384)
+    .key_deposit(CSL.BigNum.from_str(String(protocolParams.stakeKeyDeposit || "0")))
+    .build();
 
-  const txId = await submitTxOgmios(OGMIOS_URL, cborHex);
+  const builder = CSL.TransactionBuilder.new(txBuilderCfg);
+
+  const recv = CSL.Address.from_bech32(recvAddr);
+  const sender = CSL.Address.from_bech32(WALLET_ADDRESS);
+
+  const input = CSL.TransactionInput.new(
+    CSL.TransactionHash.from_bytes(Buffer.from(first.transaction_id, 'hex')),
+    first.output_index
+  );
+  const inputValue = CSL.Value.new(CSL.BigNum.from_str("2000000"));
+  builder.add_input(sender, input, inputValue);
+
+  const out = CSL.TransactionOutput.new(recv, CSL.Value.new(CSL.BigNum.from_str("1000000")));
+  builder.add_output(out);
+
+  builder.add_change_if_needed(sender);
+
+  const body = builder.build();
+
+  const bodyHex = Buffer.from(body.to_bytes()).toString('hex');
+  runInWallet(`printf %s ${bodyHex} | xxd -r -p > /tmp/send-ada.body`);
+  runInWallet(`cardano-cli transaction sign --tx-body-file /tmp/send-ada.body --signing-key-file ${SIGNING_KEY_PATH} --testnet-magic ${NETWORK_MAGIC} --out-file /tmp/send-ada.signed`);
+
+  const signedCborHex = runInWallet("xxd -p -c 100000 /tmp/send-ada.signed | tr -d '\\n'");
+  const txId = await submitTxOgmios(OGMIOS_URL, signedCborHex);
   console.log("Submitted tx via Ogmios:", txId);
 }
 
