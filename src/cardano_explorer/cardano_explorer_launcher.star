@@ -38,9 +38,18 @@ def launch_cardano_explorer(plan, cardano_context):
                     transport_protocol="TCP"
                 )
             },
+            files={
+                "/opt/cardano/config": cardano_context.config_artifact_name
+            },
             env_vars={
                 "OGMIOS_URL": "http://{}:{}".format(cardano_context.node_ip, 1337),
-                "KUPO_URL": "http://{}:{}".format(kupo.ip_address, 1442)
+                "KUPO_URL": "http://{}:{}".format(kupo.ip_address, 1442),
+                "SPRING_PROFILES_ACTIVE": "ogmios,kupo",
+                "store.cardano.network": "preprod",
+                "store.cardano.byron-genesis-file": "/opt/cardano/config/byron-genesis.json",
+                "store.cardano.shelley-genesis-file": "/opt/cardano/config/shelley-genesis.json",
+                "store.cardano.alonzo-genesis-file": "/opt/cardano/config/alonzo-genesis.json",
+                "store.cardano.conway-genesis-file": "/opt/cardano/config/conway-genesis.json"
             }
         )
     )
