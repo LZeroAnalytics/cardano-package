@@ -14,11 +14,7 @@ def launch_cardano_explorer(plan, cardano_context):
                     transport_protocol="TCP"
                 )
             },
-            files={
-                "/opt/cardano/config": cardano_context.config_artifact_name
-            },
             cmd=[
-                "--node-config", "/opt/cardano/config/config.json",
                 "--workdir", "/var/lib/kupo",
                 "--since", "origin",
                 "--prune-utxo",
