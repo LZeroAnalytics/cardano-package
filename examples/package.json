@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "send-ada": "tsx send-ada.ts",
-    "deploy-plutus": "tsx deploy-plutus.ts"
+    "deploy-plutus": "tsx deploy-plutus.ts",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
