@@ -1,157 +1,95 @@
-# Cardano LayerZero Package
+# Cardano Package
 
-This package enables LayerZero cross-chain messaging on Cardano by implementing LayerZero V2 protocol components using plu-ts smart contracts and Cardano's eUTXO model.
+This package launches a local Cardano network with Kurtosis, exposes the Cardano Submit API for real transaction submission, and includes a working block explorer so you can see blocks and transactions. It also provides example scripts to create/fund a wallet, send ADA, and deploy a simple Plutus script end-to-end.
 
-## Overview
+## Features
 
-This package provides:
-
-1. **Cardano Node Deployment**: Spins up a Cardano network with LayerZero contracts
-2. **LayerZero Contract Implementation**: EndpointV2, MessageLib, DVN, and Executor contracts ported to plu-ts
-3. **Cross-Chain Services**: DVN and Executor off-chain services for Cardano integration
-4. **OApp Support**: Example OApp implementation for cross-chain messaging testing
-
-## Architecture
-
-### Core Components
-
-- **EndpointV2**: Main entry point for cross-chain messaging on Cardano
-- **MessageLib**: Message encoding/decoding and routing logic
-- **DVN (Data Verification Network)**: Cross-chain message verification
-- **Executor**: Message execution on destination chain
-- **OApp**: Application-level contract for cross-chain functionality
-
-### UTXO Model Adaptations
-
-Unlike Ethereum's account-based model, Cardano uses an extended UTXO (eUTXO) model:
-
-- **State Management**: Contract state stored in UTXOs with datum/redeemer patterns
-- **Nonce Tracking**: Separate UTXO chains for endpoint pair nonces
-- **Message Flow**: Transactions consume input UTXOs and produce output UTXOs
-- **Fee Handling**: Native ADA and custom tokens via Cardano's native token system
+- Cardano node with custom devnet config
+- Cardano Submit API (no mocks)
+- Prefunded wallet creation
+- Explorer stack (Ogmios + Kupo + Yaci Store + Yaci Viewer) that actually displays blocks/txs
+- Example scripts:
+  - examples/send-ada.ts
+  - examples/deploy-plutus.ts
 
 ## Prerequisites
 
 1. [Install Docker & start the Docker Daemon][docker-installation]
 2. [Install the Kurtosis CLI][kurtosis-cli-installation]
-3. Ensure you have access to Ethereum networks with LayerZero contracts deployed
+3. Node.js 18+ for running example scripts (pnpm or npm)
+4. cardano-cli available in PATH for the example scripts (or run them inside a container with cardano-cli)
 
 ## Quick Start
 
-### Basic Usage
+### Run the network
 
 ```bash
-kurtosis run --enclave cardano-testnet github.com/LZeroAnalytics/cardano-package
+kurtosis clean -a
+kurtosis run --enclave cardano-local .
 ```
 
-### With Custom Configuration
+Or with custom configuration:
 
 ```bash
-kurtosis run --enclave cardano-testnet github.com/LZeroAnalytics/cardano-package --args-file network_params.yaml
+kurtosis run --enclave cardano-local . --args-file network_params.yaml
 ```
 
-### Configuration Example
-
-```yaml
-# Cardano network configuration
-cardano_params:
-  network: testnet
-  slot_length: 1
-  epoch_length: 432000
-  security_param: 2160
-
-# LayerZero configuration
-layerzero_params:
-  endpoint_id: "30199"  # Cardano endpoint ID
-  dvn_fee: "1000000"    # 1 ADA in lovelace
-  executor_fee: "2000000"  # 2 ADA in lovelace
-
-# Cross-chain connections
-connections:
-  - from: ethereum
-    to: cardano
-    ethereum_rpc: "https://eth-mainnet.alchemyapi.io/v2/YOUR_KEY"
-    ethereum_endpoint: "0x1a44076050125825900e736c501f859c50fE728c"
-    private_key: "0x..."
-
-# Additional services
-additional_services:
-  - cardano_explorer
-  - dvn_service
-  - executor_service
-```
-
-## Management
+At the end of the run, Kurtosis will print:
+- Submit API URL
+- Explorer URL (Yaci Viewer)
+- Funded wallet address and signing key path (inside the wallet-generator service)
 
 ### Service Access
 
 ```bash
-# Shell access to Cardano node
-kurtosis service shell cardano-testnet cardano-node
+# Inspect services
+kurtosis enclave inspect cardano-local
 
-# View service logs
-kurtosis service logs cardano-testnet dvn-service
-kurtosis service logs cardano-testnet executor-service
+# Logs
+kurtosis service logs cardano-local cardano-node
+kurtosis service logs cardano-local cardano-submit-api
+kurtosis service logs cardano-local ogmios
+kurtosis service logs cardano-local kupo
+kurtosis service logs cardano-local yaci-store
+kurtosis service logs cardano-local yaci-viewer
 ```
 
-### Cleanup
+### Explorer
+
+The explorer UI (Yaci Viewer) URL will be printed at the end of `kurtosis run`. Open it and verify that blocks and transactions are displayed and the height increases.
+
+## Example scripts
+
+Install deps and run:
 
 ```bash
-kurtosis enclave rm -f cardano-testnet
+cd examples
+pnpm i
+# Configure environment variables or run inside the cardano-node container where cardano-cli is available.
+# Required envs:
+#   SUBMIT_API_URL=http://<submit-service>:8090
+#   NETWORK_MAGIC=1097911063
+#   WALLET_ADDRESS=<prefunded address>
+#   SIGNING_KEY_PATH=/tmp/payment.skey
+
+# Send 1 ADA to a new address
+pnpm tsx send-ada.ts
+
+# Deploy and interact with a simple Plutus script (spend/mint)
+pnpm tsx deploy-plutus.ts
 ```
 
-## Development
+Both scripts submit real transactions via the Submit API and verify inclusion by querying the network. Check the explorer for the tx hash.
 
-### Contract Development
+## Cleanup
 
-Contracts are implemented using [plu-ts](https://pluts.harmoniclabs.tech/), a TypeScript-embedded eDSL for Cardano smart contracts.
-
-### Testing Cross-Chain Messages
-
-1. Deploy Cardano network with LayerZero contracts
-2. Deploy Ethereum network with LayerZero contracts  
-3. Register OApp on both networks
-4. Send test message from Ethereum to Cardano
-5. Verify message execution on Cardano
-
-## Technical Details
-
-### UTXO State Management
-
-```typescript
-// Example: Endpoint state UTXO structure
-const EndpointDatum = pstruct({
-    EndpointState: {
-        nonce: int,
-        config: bytestring,
-        peers: list(bytestring)
-    }
-});
+```bash
+kurtosis enclave rm -f cardano-local
 ```
-
-### Message Flow
-
-1. **Send**: Ethereum OApp → LayerZero Endpoint
-2. **Monitor**: DVN service monitors Ethereum events
-3. **Verify**: DVN service submits verification to Cardano DVN validator
-4. **Execute**: Executor service processes verified message
-5. **Deliver**: Message delivered to Cardano OApp
-
-## Coming Soon
-
-- [ ] Mainnet deployment support
-- [ ] Advanced fee estimation
-- [ ] Multi-signature DVN support
-- [ ] Cardano native token bridging
-- [ ] Performance optimizations
 
 ## License
 
 MIT License
-
-## Support
-
-For issues and contributions, please open an issue on GitHub.
 
 [docker-installation]: https://docs.docker.com/get-docker/
 [kurtosis-cli-installation]: https://docs.kurtosis.com/install

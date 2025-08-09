@@ -1,109 +1,57 @@
 constants = import_module("../package_io/constants.star")
 
 def launch_cardano_explorer(plan, cardano_context):
-    """
-    Launch Cardano Explorer with GraphQL backend and React frontend
-    
-    Args:
-        plan: Kurtosis plan object
-        cardano_context: Cardano node context
-        
-    Returns:
-        Explorer service context
-    """
-    
-    plan.print("Launching Cardano Explorer with GraphQL backend...")
-    
-    # Launch PostgreSQL database for cardano-db-sync
-    postgres_service = plan.add_service(
-        name="cardano-postgres",
+    plan.print("Launching Cardano explorer stack (Ogmios + Kupo + Yaci Store + Viewer)...")
+
+    ogmios = plan.add_service(
+        name="ogmios",
         config=ServiceConfig(
-            image=constants.POSTGRES_IMAGE,
+            image=constants.OGMIOS_IMAGE,
             ports={
-                "postgres": PortSpec(
-                    number=5432,
+                "http": PortSpec(
+                    number=1337,
                     transport_protocol="TCP"
                 )
             },
             env_vars={
-                "POSTGRES_DB": "cexplorer",
-                "POSTGRES_USER": "cardano",
-                "POSTGRES_HOST_AUTH_METHOD": "trust"
+                "CARDANO_NODE_SOCKET_PATH": cardano_context.socket_path
             }
         )
     )
-    
-    # Wait for PostgreSQL to be ready
-    plan.wait(
-        service_name="cardano-postgres",
-        recipe=ExecRecipe(
-            command=["pg_isready", "-U", "cardano", "-d", "cexplorer"]
-        ),
-        field="code",
-        assertion="==",
-        target_value=0,
-        timeout="60s"
-    )
-    
-    # Launch cardano-db-sync to sync blockchain data to PostgreSQL
-    db_sync_service = plan.add_service(
-        name="cardano-db-sync",
+
+    kupo = plan.add_service(
+        name="kupo",
         config=ServiceConfig(
-            image=constants.CARDANO_DB_SYNC_IMAGE,
-            env_vars={
-                "POSTGRES_HOST": postgres_service.ip_address,
-                "POSTGRES_PORT": "5432",
-                "POSTGRES_DB": "cexplorer",
-                "POSTGRES_USER": "cardano",
-                "POSTGRES_PASSWORD": "",
-                "CARDANO_NODE_SOCKET_PATH": cardano_context.socket_path,
-                "CARDANO_NODE_CONFIG_PATH": "/opt/cardano/config/config.json",
-                "NETWORK": "custom"
-            },
-            cmd=[
-                "cardano-db-sync",
-                "--config", "/opt/cardano/config/config.json",
-                "--socket-path", cardano_context.socket_path,
-                "--state-dir", "/opt/cardano/data",
-                "--schema-dir", "/opt/cardano/schema"
-            ],
-            files={
-                "/opt/cardano/config": cardano_context.config_artifact_name
-            }
-        )
-    )
-    
-    # Launch cardano-graphql backend
-    graphql_service = plan.add_service(
-        name="cardano-graphql",
-        config=ServiceConfig(
-            image="inputoutput/cardano-graphql:8.0.0",
+            image=constants.KUPO_IMAGE,
             ports={
-                "graphql": PortSpec(
-                    number=constants.CARDANO_GRAPHQL_PORT,
+                "http": PortSpec(
+                    number=1442,
                     transport_protocol="TCP"
                 )
             },
             env_vars={
-                "POSTGRES_HOST": postgres_service.ip_address,
-                "POSTGRES_PORT": "5432",
-                "POSTGRES_DB": "cexplorer",
-                "POSTGRES_USER": "cardano",
-                "POSTGRES_PASSWORD": "",
-                "CARDANO_NODE_CONFIG_PATH": "/opt/cardano/config/config.json",
-                "HASURA_URI": "http://localhost:8080/v1/graphql"
-            },
-            files={
-                "/opt/cardano/config": cardano_context.config_artifact_name
+                "CARDANO_NODE_SOCKET_PATH": cardano_context.socket_path
             }
         )
     )
-    
-    # Launch cardano-explorer-app frontend
-    explorer_frontend_service = plan.add_service(
+
+    yaci_store = plan.add_service(
+        name="yaci-store",
+        config=ServiceConfig(
+            image=constants.YACI_STORE_IMAGE,
+            ports={
+                "http": PortSpec(
+                    number=9999,
+                    transport_protocol="TCP"
+                )
+            }
+        )
+    )
+
+    yaci_viewer = plan.add_service(
         name=constants.CARDANO_EXPLORER_SERVICE,
         config=ServiceConfig(
-            image="inputoutput/cardano-explorer:latest",
+            image=constants.YACI_VIEWER_IMAGE,
             ports={
                 "frontend": PortSpec(
                     number=constants.CARDANO_EXPLORER_PORT,
@@ -111,48 +59,18 @@ def launch_cardano_explorer(plan, cardano_context):
                 )
             },
             env_vars={
-                "GRAPHQL_URI": "http://{}:{}".format(
-                    graphql_service.ip_address,
-                    constants.CARDANO_GRAPHQL_PORT
-                ),
-                "CARDANO_NETWORK": cardano_context.network
+                "YACI_STORE_URL": "http://{}:{}".format(yaci_store.ip_address, 9999)
             }
         )
     )
-    
-    # Wait for GraphQL service to be ready
-    plan.wait(
-        service_name="cardano-graphql",
-        recipe=ExecRecipe(
-            command=["curl", "-f", "http://localhost:3100/graphql"]
-        ),
-        field="code",
-        assertion="==",
-        target_value=0,
-        timeout="120s"
-    )
-    
-    plan.print("Cardano Explorer launched successfully!")
-    plan.print("Frontend available at: http://{}:{}".format(
-        explorer_frontend_service.ip_address,
-        constants.CARDANO_EXPLORER_PORT
-    ))
-    plan.print("GraphQL API available at: http://{}:{}".format(
-        graphql_service.ip_address,
-        constants.CARDANO_GRAPHQL_PORT
-    ))
-    
+
+    plan.print("Explorer launched")
+    plan.print("Viewer: http://{}:{}".format(yaci_viewer.ip_address, constants.CARDANO_EXPLORER_PORT))
+
     return struct(
-        frontend_service=explorer_frontend_service,
-        graphql_service=graphql_service,
-        postgres_service=postgres_service,
-        db_sync_service=db_sync_service,
-        frontend_url="http://{}:{}".format(
-            explorer_frontend_service.ip_address,
-            constants.CARDANO_EXPLORER_PORT
-        ),
-        graphql_url="http://{}:{}".format(
-            graphql_service.ip_address,
-            constants.CARDANO_GRAPHQL_PORT
-        )
+        viewer_service=yaci_viewer,
+        yaci_store_service=yaci_store,
+        kupo_service=kupo,
+        ogmios_service=ogmios,
+        frontend_url="http://{}:{}".format(yaci_viewer.ip_address, constants.CARDANO_EXPLORER_PORT)
     )
