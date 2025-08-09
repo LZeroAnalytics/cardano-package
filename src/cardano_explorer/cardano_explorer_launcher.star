@@ -64,7 +64,7 @@ def launch_cardano_explorer(plan, cardano_context):
                 )
             },
             env_vars={
-                "YACI_STORE_URL": "http://{}:{}".format(yaci_store.ip_address, 8080)
+                "VITE_INDEXER_BASE_URL": "http://{}:{}/api/v1".format(yaci_store.ip_address, 8080)
             }
         )
     )
