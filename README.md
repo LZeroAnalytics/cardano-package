@@ -5,7 +5,7 @@ This package launches a local Cardano network with Kurtosis and includes a worki
 ## Features
 
 - Cardano node with built-in Ogmios (1337) on a local devnet
-- Prefunded wallet creation
+- Wallet generator + faucet funding flow (preprod-like)
 - Explorer stack (Kupo + Yaci Store + Yaci Viewer) that actually displays blocks/txs
 - Example scripts that submit via Ogmios tx-submission:
   - examples/send-ada.ts
@@ -34,9 +34,9 @@ kurtosis run --enclave cardano-local . --args-file network_params.yaml
 ```
 
 At the end of the run, Kurtosis will print:
-- Ogmios URL
+- Ogmios port (mapped from container port 1337)
 - Explorer URL (Yaci Viewer)
-- Funded wallet address and signing key path (inside the wallet-generator service)
+- Generated wallet address (inside the wallet-generator service)
 
 ### Service Access
 
@@ -65,7 +65,7 @@ cd examples
 pnpm i
 # Configure environment variables or run inside the cardano-node container where cardano-cli is available.
 # Required envs:
-#   OGMIOS_URL=http://<cardano-node>:1337
+#   OGMIOS_URL=http://127.0.0.1:&lt;mapped_port&gt;
 #   NETWORK_MAGIC=1097911063
 #   WALLET_ADDRESS=<prefunded address>
 #   SIGNING_KEY_PATH=/tmp/payment.skey

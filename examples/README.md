@@ -3,13 +3,13 @@ Example scripts (TypeScript) using Ogmios tx-submission.
 Prereqs:
 - Node.js 18+
 - pnpm (or npm/yarn)
-- Kurtosis package running; note the Ogmios URL printed by the run (http://<ip>:1337)
+- Kurtosis package running; find the Ogmios mapped port via: `kurtosis enclave inspect cardano-local` (service `cardano-node` port 1337 maps to localhost)
 
 Setup:
 - cd examples
 - pnpm install
 - Create .env with:
-  OGMIOS_URL=http://<ip>:1337
+  OGMIOS_URL=http://127.0.0.1:<mapped_port>
   NETWORK_MAGIC=1097911063
   WALLET_ADDRESS=<prefunded_address_from_run_output>
   SIGNING_KEY_PATH=/tmp/payment.skey
