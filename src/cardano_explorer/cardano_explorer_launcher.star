@@ -13,9 +13,16 @@ def launch_cardano_explorer(plan, cardano_context):
                     transport_protocol="TCP"
                 )
             },
-            env_vars={
-                "CARDANO_NODE_SOCKET_PATH": cardano_context.socket_path
-            }
+            files={
+                "/opt/cardano/config": cardano_context.config_artifact_name
+            },
+            cmd=[
+                "ogmios",
+                "--node-socket", constants.CARDANO_SOCKET_PATH,
+                "--node-config", "/opt/cardano/config/config.json",
+                "--host", "0.0.0.0",
+                "--port", "1337"
+            ]
         )
     )
 
@@ -29,9 +36,20 @@ def launch_cardano_explorer(plan, cardano_context):
                     transport_protocol="TCP"
                 )
             },
-            env_vars={
-                "CARDANO_NODE_SOCKET_PATH": cardano_context.socket_path
-            }
+            files={
+                "/opt/cardano/config": cardano_context.config_artifact_name
+            },
+            cmd=[
+                "kupo",
+                "--node-socket", constants.CARDANO_SOCKET_PATH,
+                "--node-config", "/opt/cardano/config/config.json",
+                "--workdir", "/var/lib/kupo",
+                "--since", "origin",
+                "--prune-utxo",
+                "--defer-db-indexes",
+                "--host", "0.0.0.0",
+                "--port", "1442"
+            ]
         )
     )
 
@@ -44,6 +62,10 @@ def launch_cardano_explorer(plan, cardano_context):
                     number=9999,
                     transport_protocol="TCP"
                 )
+            },
+            env_vars={
+                "OGMIOS_URL": "http://{}:{}".format(ogmios.ip_address, 1337),
+                "KUPO_URL": "http://{}:{}".format(kupo.ip_address, 1442)
             }
         )
     )
