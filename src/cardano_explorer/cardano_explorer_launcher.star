@@ -45,6 +45,8 @@ def launch_cardano_explorer(plan, cardano_context):
                 "SPRING_PROFILES_ACTIVE": "ogmios,kupo",
                 "STORE_CARDANO_NETWORK": "preprod",
                 "STORE_CARDANO_PROTOCOL_MAGIC": "1",
+                "STORE_CARDANO_HOST": "preprod-node.play.dev.cardano.org",
+                "STORE_CARDANO_PORT": "3001",
                 "STORE_CARDANO_OGMIOS_URL": "http://{}:{}".format(cardano_context.node_ip, 1337),
                 "STORE_CARDANO_KUPO_URL": "http://{}:{}".format(kupo.ip_address, 1442)
             }
