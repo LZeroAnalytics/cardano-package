@@ -17,6 +17,10 @@ def launch_cardano_node(plan, cardano_params):
                 "http": PortSpec(
                     number=17798,
                     transport_protocol="TCP"
+                ),
+                "ogmios": PortSpec(
+                    number=1337,
+                    transport_protocol="TCP"
                 )
             },
             files={
