@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import axios from "axios";
 import { readFileSync } from "fs";
 import { execSync } from "child_process";
+import { submitTxOgmios } from "./ogmios";
 
-const SUBMIT_API_URL = process.env.SUBMIT_API_URL || "http://localhost:8090";
+const OGMIOS_URL = process.env.OGMIOS_URL || "http://localhost:1337";
 const NETWORK_MAGIC = process.env.NETWORK_MAGIC || "1097911063";
 const WALLET_ADDRESS = process.env.WALLET_ADDRESS || "";
 const SIGNING_KEY_PATH = process.env.SIGNING_KEY_PATH || "/tmp/payment.skey";
@@ -28,12 +28,10 @@ async function main() {
 
   run(`cardano-cli transaction build --testnet-magic ${NETWORK_MAGIC} --tx-in ${txIn} --tx-out "${recvAddr}+1000000" --change-address ${WALLET_ADDRESS} --out-file /tmp/send-ada.raw`);
   run(`cardano-cli transaction sign --tx-body-file /tmp/send-ada.raw --signing-key-file ${SIGNING_KEY_PATH} --testnet-magic ${NETWORK_MAGIC} --out-file /tmp/send-ada.signed`);
-  const cbor = readFileSync("/tmp/send-ada.signed");
+  const cborHex = readFileSync("/tmp/send-ada.signed").toString("hex");
 
-  const res = await axios.post(`${SUBMIT_API_URL}/api/submit/tx`, cbor, {
-    headers: { "Content-Type": "application/cbor" },
-  });
-  console.log("Submitted tx:", res.data);
+  const txId = await submitTxOgmios(OGMIOS_URL, cborHex);
+  console.log("Submitted tx via Ogmios:", txId);
 }
 
 main().catch((e) => {
