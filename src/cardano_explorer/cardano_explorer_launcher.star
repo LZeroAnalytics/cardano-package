@@ -17,7 +17,6 @@ def launch_cardano_explorer(plan, cardano_context):
                 "/opt/cardano/config": cardano_context.config_artifact_name
             },
             cmd=[
-                "ogmios",
                 "--node-socket", constants.CARDANO_SOCKET_PATH,
                 "--node-config", "/opt/cardano/config/config.json",
                 "--host", "0.0.0.0",
@@ -40,7 +39,6 @@ def launch_cardano_explorer(plan, cardano_context):
                 "/opt/cardano/config": cardano_context.config_artifact_name
             },
             cmd=[
-                "kupo",
                 "--node-socket", constants.CARDANO_SOCKET_PATH,
                 "--node-config", "/opt/cardano/config/config.json",
                 "--workdir", "/var/lib/kupo",
