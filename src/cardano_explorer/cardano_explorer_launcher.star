@@ -21,6 +21,7 @@ def launch_cardano_explorer(plan, cardano_context):
                 "--defer-db-indexes",
                 "--host", "0.0.0.0",
                 "--port", "1442",
+                "--match", ".*",
                 "--ogmios-host", cardano_context.node_ip,
                 "--ogmios-port", "1337"
             ]
