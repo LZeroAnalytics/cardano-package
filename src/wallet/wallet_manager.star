@@ -106,8 +106,7 @@ def get_wallet_utxos(plan, wallet_context, cardano_context):
             command=[
                 "cardano-cli", "query", "utxo",
                 "--address", wallet_context.address,
-                "--testnet-magic", "1097911063",
-                "--socket-path", cardano_context.socket_path
+                "--testnet-magic", "1097911063"
             ]
         )
     )
