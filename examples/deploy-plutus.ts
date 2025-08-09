@@ -32,11 +32,11 @@ EOF`);
   const [txHash, txIx] = lines[0].split(/\\s+/);
   const txIn = `${txHash}#${txIx}`;
 
-  runInWallet(\`echo "\${WALLET_ADDRESS}" > /tmp/change.addr\`);
+  runInWallet(`echo "${WALLET_ADDRESS}" > /tmp/change.addr`);
 
-  runInWallet(\`cardano-cli transaction build --testnet-magic \${NETWORK_MAGIC} --tx-in \${txIn} --tx-out "\$(cat /tmp/change.addr)+5000000" --change-address \${WALLET_ADDRESS} --out-file /tmp/plutus.raw\`);
+  runInWallet(`cardano-cli transaction build --testnet-magic ${NETWORK_MAGIC} --tx-in ${txIn} --tx-out "$(cat /tmp/change.addr)+5000000" --change-address ${WALLET_ADDRESS} --out-file /tmp/plutus.raw`);
 
-  runInWallet(\`cardano-cli transaction sign --tx-body-file /tmp/plutus.raw --signing-key-file \${SIGNING_KEY_PATH} --testnet-magic \${NETWORK_MAGIC} --out-file /tmp/plutus.signed\`);
+  runInWallet(`cardano-cli transaction sign --tx-body-file /tmp/plutus.raw --signing-key-file ${SIGNING_KEY_PATH} --testnet-magic ${NETWORK_MAGIC} --out-file /tmp/plutus.signed`);
 
   const cborHex = runInWallet("xxd -p -c 100000 /tmp/plutus.signed | tr -d '\\n'");
   const txId = await submitTxOgmios(OGMIOS_URL, cborHex);

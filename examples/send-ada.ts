@@ -29,8 +29,8 @@ cat /tmp/recv.addr; fi`);
   const [txHash, txIx] = lines[0].split(/\\s+/);
   const txIn = `${txHash}#${txIx}`;
 
-  runInWallet(\`cardano-cli transaction build --testnet-magic \${NETWORK_MAGIC} --tx-in \${txIn} --tx-out "\${recvAddr}+1000000" --change-address \${WALLET_ADDRESS} --out-file /tmp/send-ada.raw\`);
-  runInWallet(\`cardano-cli transaction sign --tx-body-file /tmp/send-ada.raw --signing-key-file \${SIGNING_KEY_PATH} --testnet-magic \${NETWORK_MAGIC} --out-file /tmp/send-ada.signed\`);
+  runInWallet(`cardano-cli transaction build --testnet-magic ${NETWORK_MAGIC} --tx-in ${txIn} --tx-out "${recvAddr}+1000000" --change-address ${WALLET_ADDRESS} --out-file /tmp/send-ada.raw`);
+  runInWallet(`cardano-cli transaction sign --tx-body-file /tmp/send-ada.raw --signing-key-file ${SIGNING_KEY_PATH} --testnet-magic ${NETWORK_MAGIC} --out-file /tmp/send-ada.signed`);
 
   const cborHex = runInWallet("xxd -p -c 100000 /tmp/send-ada.signed | tr -d '\\n'");
 
