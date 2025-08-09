@@ -12,7 +12,7 @@ CARDANO_NODE_SERVICE = "cardano-node"
 CARDANO_EXPLORER_SERVICE = "cardano-explorer"
 
 # Container images
-CARDANO_NODE_IMAGE = "cardanocommunity/cardano-node:latest"
+CARDANO_NODE_IMAGE = "cardanosolutions/cardano-node-ogmios:latest"
 CARDANO_CLI_IMAGE = "cardanocommunity/cardano-node:latest"
 
 # Explorer/indexer images
