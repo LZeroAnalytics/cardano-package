@@ -49,7 +49,8 @@ def launch_cardano_explorer(plan, cardano_context):
                 "STORE_CARDANO_HASBYRON": "false",
                 "STORE_CARDANO_SHELLEY_GENESIS_FILE": "/opt/cardano/config/shelley-genesis.json",
                 "STORE_CARDANO_ALONZO_GENESIS_FILE": "/opt/cardano/config/alonzo-genesis.json",
-                "STORE_CARDANO_CONWAY_GENESIS_FILE": "/opt/cardano/config/conway-genesis.json"
+                "STORE_CARDANO_CONWAY_GENESIS_FILE": "/opt/cardano/config/conway-genesis.json",
+                "STORE_CARDANO_BYRON_GENESIS_FILE": "/opt/cardano/config/byron-genesis.json"
             }
         )
     )
