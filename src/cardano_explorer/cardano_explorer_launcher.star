@@ -34,7 +34,7 @@ def launch_cardano_explorer(plan, cardano_context):
             image=constants.YACI_STORE_IMAGE,
             ports={
                 "http": PortSpec(
-                    number=9999,
+                    number=8080,
                     transport_protocol="TCP"
                 )
             },
@@ -46,7 +46,7 @@ def launch_cardano_explorer(plan, cardano_context):
                 "STORE_CARDANO_NETWORK": "preprod",
                 "STORE_CARDANO_OGMIOS_URL": "http://{}:{}".format(cardano_context.node_ip, 1337),
                 "STORE_CARDANO_KUPO_URL": "http://{}:{}".format(kupo.ip_address, 1442),
-                "STORE_CARDANO_HASBYRON": "false",
+                "STORE_CARDANO_HAS_BYRON": "false",
                 "STORE_CARDANO_SHELLEY_GENESIS_FILE": "/opt/cardano/config/shelley-genesis.json",
                 "STORE_CARDANO_ALONZO_GENESIS_FILE": "/opt/cardano/config/alonzo-genesis.json",
                 "STORE_CARDANO_CONWAY_GENESIS_FILE": "/opt/cardano/config/conway-genesis.json"
@@ -65,7 +65,7 @@ def launch_cardano_explorer(plan, cardano_context):
                 )
             },
             env_vars={
-                "YACI_STORE_URL": "http://{}:{}".format(yaci_store.ip_address, 9999)
+                "YACI_STORE_URL": "http://{}:{}".format(yaci_store.ip_address, 8080)
             }
         )
     )
