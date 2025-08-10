@@ -25,7 +25,7 @@ def generate_faucet_keys(plan, network_magic):
     )
     addr_res = plan.exec(service_name="faucet-keygen", recipe=ExecRecipe(command=["cat", "/tmp/faucet.addr"]))
     faucet_addr = addr_res["output"].strip()
-    files_art = plan.save_files(
+    files_art = plan.save_service_files(
         service_name="faucet-keygen",
         src="/tmp",
         name="faucet-keys"

@@ -1,6 +1,7 @@
 import express from "express";
 import 'dotenv/config';
 import fs from "fs";
+import { execSync } from "child_process";
 import * as CSL from "@emurgo/cardano-serialization-lib-nodejs";
 
 const app = express();
@@ -24,7 +25,8 @@ async function kupoUtxos(address) {
 }
 
 async function ogmiosQuery(method, params) {
-  const ws = new (await import('ws')).WebSocket(OGMIOS_URL.replace("http", "ws"));
+  const { WebSocket } = await import('ws');
+  const ws = new WebSocket(OGMIOS_URL.replace("http", "ws"));
   const req = {
     type: "jsonwsp/request",
     version: "1.0",
@@ -42,12 +44,6 @@ async function ogmiosQuery(method, params) {
   });
   if (res.type !== "jsonwsp/response") throw new Error("ogmios bad response");
   return res.result;
-}
-
-function readSkey(path) {
-  const sk = JSON.parse(fs.readFileSync(path, "utf8"));
-  const cborHex = sk.cborHex || sk.cbor_hex;
-  return Buffer.from(cborHex, "hex");
 }
 
 app.get("/health", (_req, res) => {
@@ -88,24 +84,22 @@ app.post("/fund", async (req, res) => {
     builder.add_change_if_needed(faucetAddr);
 
     const txBody = builder.build();
-    const txHash = CSL.hash_transaction(txBody);
+    const bodyHex = Buffer.from(txBody.to_bytes()).toString('hex');
 
-    const skeyCbor = readSkey(FAUCET_SIGNING_KEY_PATH);
-    const sk = CSL.PrivateKey.from_normal_bytes(CSL.CSLHash.from_bytes(skeyCbor).to_bytes()).to_bech32(); // placeholder decode
-    const witnessSet = CSL.TransactionWitnessSet.new();
+    execSync(`printf %s ${bodyHex} | xxd -r -p > /tmp/faucet-tx.body`, { stdio: ["ignore", "pipe", "pipe"] });
+    execSync(`cardano-cli transaction sign --tx-body-file /tmp/faucet-tx.body --signing-key-file ${FAUCET_SIGNING_KEY_PATH} --testnet-magic ${NETWORK_MAGIC} --out-file /tmp/faucet-tx.signed`, { stdio: ["ignore", "pipe", "pipe"] });
+    const signedHex = execSync(`xxd -p -c 100000 /tmp/faucet-tx.signed | tr -d '\\n'`).toString().trim();
 
-    const tx = CSL.Transaction.new(txBody, witnessSet, undefined);
-    const txHex = Buffer.from(tx.to_bytes()).toString('hex');
-
-    const submitRes = await new Promise((resolve, reject) => {
-      const ws = new (require('ws')).WebSocket(OGMIOS_URL.replace("http","ws"));
+    const { WebSocket } = await import('ws');
+    const ws = new WebSocket(OGMIOS_URL.replace("http","ws"));
+    const submit = await new Promise((resolve, reject) => {
       ws.on("open", () => {
         ws.send(JSON.stringify({
           type: "jsonwsp/request",
           version: "1.0",
           servicename: "ogmios",
           methodname: "SubmitTx",
-          args: { "submit": { "transaction": txHex } }
+          args: { "submit": { "transaction": signedHex } }
         }));
       });
       ws.on("message", (data) => {
@@ -114,7 +108,8 @@ app.post("/fund", async (req, res) => {
       });
       ws.on("error", reject);
     });
-    return res.json({ result: submitRes });
+
+    return res.json({ result: submit });
   } catch (e) {
     return res.status(500).json({ error: String(e && e.message || e) });
   }
@@ -122,6 +117,5 @@ app.post("/fund", async (req, res) => {
 
 const port = Number(process.env.PORT || 8081);
 app.listen(port, () => {
-  // eslint-disable-next-line no-console
   console.log(`faucet listening on ${port}`);
 });
