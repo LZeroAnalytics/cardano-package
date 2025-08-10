@@ -50,7 +50,7 @@ def generate_local_devnet(plan, cardano_params, faucet_address, prefunded_accoun
                 "  tmp=/out/genesis/shelley.tmp && jq \"$jqscript\" /out/genesis/shelley.json > $tmp && mv $tmp /out/genesis/shelley.json; ",
                 "fi",
                 "echo 'devnet prepared'",
-                "sleep 1"
+                "sleep 300"
             ])]
         )
     )
