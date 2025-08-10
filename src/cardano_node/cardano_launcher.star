@@ -56,7 +56,8 @@ def launch_cardano_node(plan, cardano_params, faucet_address, prefunded_accounts
                     "if [ -n \"$PREFUNDS_JSON\" ]; then",
                     "  tmp=/out/genesis/shelley.tmp && jq --argjson add \"$PREFUNDS_JSON\" '.initialFunds += $add' /out/genesis/shelley.json > $tmp && mv $tmp /out/genesis/shelley.json",
                     "fi",
-                    "ls -la /out/genesis >/dev/null"
+                    "ls -la /out/genesis >/dev/null",
+                    "tail -f /dev/null"
                 ])
             ]
         )
