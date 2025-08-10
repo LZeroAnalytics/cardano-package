@@ -1,52 +1,19 @@
 
 cardano_params:
   network: testnet
-  
   slot_length: 1
-  
-  epoch_length: 432000  # 5 days in seconds
-  
+  epoch_length: 432000
   security_param: 2160
-  
-  initial_supply: "45000000000000000"  # 45 billion ADA in lovelace
-  
+  initial_supply: "45000000000000000"
   network_magic: 1097911063
 
-layerzero_params:
-  endpoint_id: "30199"
-  
-  dvn_fee: "1000000"      # 1 ADA
-  executor_fee: "2000000" # 2 ADA
-  
-  required_confirmations: 12
-  
-  max_gas_limit: "10000000"
-
-connections: []
-
 additional_services:
-  - cardano_explorer  # Cardano blockchain explorer
-  - dvn_service      # Data Verification Network service
-  - executor_service # Message execution service
+  - cardano_explorer
 
 log_level: "info"
 
-resource_limits:
-  cardano_node:
-    cpu: "2000m"      # 2 CPU cores
-    memory: "4Gi"     # 4GB RAM
-    storage: "100Gi"  # 100GB storage
-  
-  dvn_service:
-    cpu: "500m"       # 0.5 CPU cores
-    memory: "1Gi"     # 1GB RAM
-  
-  executor_service:
-    cpu: "500m"       # 0.5 CPU cores
-    memory: "1Gi"     # 1GB RAM
-
 dev_mode:
   enabled: false
-  fast_epochs: true      # Shorter epochs for testing
-  debug_logging: true    # Verbose logging
-  mock_time: false       # Use real time vs simulated
+  fast_epochs: true
+  debug_logging: true
+  mock_time: false

@@ -1,0 +1,11 @@
+{
+  "name": "@lzeroanalytics/cardano-faucet",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "express": "^4.19.2",
+    "@emurgo/cardano-serialization-lib-nodejs": "^11.5.0",
+    "ws": "^8.18.0",
+    "dotenv": "^16.4.5"
+  }
+}

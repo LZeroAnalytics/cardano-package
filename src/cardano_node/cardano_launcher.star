@@ -1,125 +1,51 @@
 constants = import_module("../package_io/constants.star")
 
-def launch_cardano_node(plan, cardano_params, layerzero_params):
-    """
-    Launch a Cardano node with LayerZero configuration
-    
-    Args:
-        plan: Kurtosis plan object
-        cardano_params: Cardano network configuration
-        layerzero_params: LayerZero protocol configuration
-        
-    Returns:
-        Cardano context with node information and LayerZero setup
-    """
-    
-    plan.print("Launching Cardano node with network: {}".format(cardano_params.network))
-    
-    # Generate Cardano network configuration files
-    config_files = _generate_cardano_config(plan, cardano_params)
-    
-    # Launch Cardano node using cardanocommunity/cardano-node image format
+def launch_cardano_node(plan, devnet_files_artifact, network_magic):
+    plan.print("Launching Cardano node from generated local devnet files")
+
     cardano_node_service = plan.add_service(
         name=constants.CARDANO_NODE_SERVICE,
         config=ServiceConfig(
             image=constants.CARDANO_NODE_IMAGE,
+            entrypoint=["/bin/sh"],
             ports={
-                "node": PortSpec(
-                    number=6000,  # cardanocommunity image uses port 6000
-                    transport_protocol="TCP"
-                ),
-                "http": PortSpec(
-                    number=17798,  # HTTP monitoring port used by cardanocommunity image
+                "ogmios": PortSpec(
+                    number=1337,
                     transport_protocol="TCP"
                 )
             },
             files={
-                "/opt/cardano/cnode/priv/files": config_files,  # Mount to files directory as expected by cardanocommunity image
-            },
-            env_vars={
-                "NETWORK": "guild",  # Use guild network for custom configurations
-                "CARDANO_NODE_SOCKET_PATH": "/opt/cardano/cnode/sockets/node0.socket"
-            }
-        )
-    )
-    
-    # Wait for Cardano node to be ready (check if node port is accessible)
-    plan.wait(
-        service_name=constants.CARDANO_NODE_SERVICE,
-        recipe=ExecRecipe(
-            command=["sh", "-c", "netstat -ln | grep :6000 || ss -ln | grep :6000"]
-        ),
-        field="code",
-        assertion="==",
-        target_value=0,  # Command should succeed when port is listening
-        timeout="300s"
-    )
-    
-    # Launch Cardano submit API service
-    submit_api_service = plan.add_service(
-        name="cardano-submit-api",
-        config=ServiceConfig(
-            image="apexpool/cardano-submit-api:latest",
-            ports={
-                "api": PortSpec(
-                    number=8090,
-                    transport_protocol="TCP"
-                )
-            },
-            files={
-                "/opt/cardano/config": config_files,
+                "/devnet": devnet_files_artifact
             },
             cmd=[
-                "cardano-submit-api",
-                "--config", "/opt/cardano/config/submit-api.json",
-                "--socket-path", "/opt/cardano/cnode/sockets/node0.socket",
-                "--port", "8090",
-                "--listen-address", "0.0.0.0",
-                "--testnet-magic", str(cardano_params.network_magic)
-            ],
-            env_vars={
-                "CARDANO_NODE_SOCKET_PATH": constants.CARDANO_SOCKET_PATH
-            }
+                "-lc",
+                "\n".join([
+                    "set -e",
+                    "mkdir -p /work /data",
+                    "cp -r /devnet/* /work/",
+                    "test -f /work/config.json || cp -f /work/cardano-node/config.json /work/config.json 2>/dev/null || true",
+                    "if [ -d /work/genesis ]; then",
+                    "  cp -f /work/genesis/byron.json /work/byron-genesis.json 2>/dev/null || true;",
+                    "  cp -f /work/genesis/shelley.json /work/shelley-genesis.json 2>/dev/null || true;",
+                    "  cp -f /work/genesis/alonzo.json /work/alonzo-genesis.json 2>/dev/null || true;",
+                    "  cp -f /work/genesis/conway.json /work/conway-genesis.json 2>/dev/null || true;",
+                    "fi",
+                    "KES=/work/keys/kes.skey; VRF=/work/keys/vrf.skey; CERT=/work/keys/opcert.cert;",
+                    "EXTRA=\"\"; if [ -f $KES ] && [ -f $VRF ] && [ -f $CERT ]; then EXTRA=\"--shelley-kes-key $KES --shelley-vrf-key $VRF --shelley-operational-certificate $CERT\"; fi",
+                    "cardano-node run --config /work/config.json --database-path /data --topology /work/topology.json --socket-path /work/node.socket $EXTRA &",
+                    "sleep 2",
+                    "ogmios --node-socket /work/node.socket --node-config /work/config.json --host 0.0.0.0 --port 1337 &",
+                    "tail -f /dev/null"
+                ])
+            ]
         )
     )
-    
-    # Create LayerZero-specific configuration
-    layerzero_config = _setup_layerzero_config(plan, layerzero_params)
-    
+
     return struct(
         node_service=cardano_node_service,
-        submit_api_service=submit_api_service,
         node_ip=cardano_node_service.ip_address,
-        node_port=6000,  # Updated to match cardanocommunity image
-        submit_api_url="http://{}:{}".format(
-            submit_api_service.ip_address, 
-            8090
-        ),
-        socket_path=constants.CARDANO_SOCKET_PATH,
-        network=cardano_params.network,
-        network_magic=cardano_params.network_magic,
-        layerzero_config=layerzero_config,
-        config_artifact_name=config_files
-    )
-
-def _generate_cardano_config(plan, cardano_params):
-    """Generate Cardano node configuration files"""
-    
-    # Use the existing static configuration files
-    config_files = plan.upload_files(
-        src="static_files/cardano_config/",
-        name="cardano-config-files"
-    )
-    
-    return config_files
-
-def _setup_layerzero_config(plan, layerzero_params):
-    """Setup LayerZero-specific configuration for Cardano"""
-    
-    return struct(
-        endpoint_id=layerzero_params.endpoint_id,
-        dvn_fee=layerzero_params.dvn_fee,
-        executor_fee=layerzero_params.executor_fee,
-        required_confirmations=layerzero_params.required_confirmations,
-        max_gas_limit=layerzero_params.max_gas_limit
+        ogmios_url="http://{}:{}".format(cardano_node_service.ip_address, 1337),
+        network="local",
+        network_magic=network_magic,
+        config_artifact_name=devnet_files_artifact
     )
