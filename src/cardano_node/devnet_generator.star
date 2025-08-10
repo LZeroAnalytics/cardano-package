@@ -2,7 +2,7 @@ constants = import_module("../package_io/constants.star")
 
 def generate_local_devnet(plan, cardano_params, faucet_address, prefunded_accounts):
     pkg_files = plan.upload_files(
-        src="./src/cardano_node/static_files/cardano_config/",
+        src="./static_files/cardano_config/",
         name="cardano-static-config"
     )
 
