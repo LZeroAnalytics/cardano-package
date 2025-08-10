@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@emurgo/cardano-serialization-lib-nodejs':
+        specifier: ^11.5.0
+        version: 11.5.0
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1
@@ -29,6 +32,9 @@ importers:
         version: 5.9.2
 
 packages:
+
+  '@emurgo/cardano-serialization-lib-nodejs@11.5.0':
+    resolution: {integrity: sha512-IlVABlRgo9XaTR1NunwZpWcxnfEv04ba2l1vkUz4S1W7Jt36F4CtffP+jPeqBZGnAe+fnUwo0XjIJC3ZTNToNQ==}
 
   '@esbuild/aix-ppc64@0.25.8':
     resolution: {integrity: sha512-urAvrUedIqEiFR3FYSLTWQgLu5tb+m0qZw0NBEasUeo6wuqatkMDaRT+1uABiGXEu5vqgPd7FGE1BhsAIy9QVA==}
@@ -238,6 +244,8 @@ packages:
         optional: true
 
 snapshots:
+
+  '@emurgo/cardano-serialization-lib-nodejs@11.5.0': {}
 
   '@esbuild/aix-ppc64@0.25.8':
     optional: true
