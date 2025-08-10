@@ -39,8 +39,8 @@ def launch_cardano_node(plan, devnet_files_artifact, network_magic):
     return struct(
         node_service=cardano_node_service,
         node_ip=cardano_node_service.ip_address,
-        ogmios_url=\"http://{}:{}\".format(cardano_node_service.ip_address, 1337),
-        network=\"local\",
+        ogmios_url="http://{}:{}".format(cardano_node_service.ip_address, 1337),
+        network="local",
         network_magic=network_magic,
         config_artifact_name=devnet_files_artifact
     )
