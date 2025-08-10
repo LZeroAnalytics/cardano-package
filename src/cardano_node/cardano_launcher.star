@@ -19,6 +19,7 @@ def launch_cardano_node(plan, cardano_params, faucet_address, prefunded_accounts
         name=constants.CARDANO_NODE_SERVICE,
         config=ServiceConfig(
             image=constants.CARDANO_NODE_IMAGE,
+            entrypoint=["/bin/sh"],
             ports={
                 "ogmios": PortSpec(
                     number=1337,
@@ -32,12 +33,12 @@ def launch_cardano_node(plan, cardano_params, faucet_address, prefunded_accounts
                 "PREFUNDS_JSON": prefunds_json
             },
             cmd=[
-                "/bin/sh","-lc",
+                "-lc",
                 "\n".join([
                     "set -e",
                     "mkdir -p /work /data",
                     "cp -r /config/* /work/",
-                    "(apk add --no-cache jq || (apt-get update && apt-get install -y jq) || true)",
+                    "(apk add --no-cache jq curl || (apt-get update && apt-get install -y jq curl) || true)",
                     "if [ -f /work/shelley-genesis.json ]; then",
                     "  tmp=/work/shelley-genesis.tmp",
                     "  jq --argjson add '{}' '.initialFunds += $add' /work/shelley-genesis.json > $tmp && mv $tmp /work/shelley-genesis.json",
