@@ -2,7 +2,7 @@ constants = import_module("../package_io/constants.star")
 
 def launch_faucet(plan, cardano_context, explorer_context, faucet_keys, faucet_config={}):
     server_files = plan.upload_files(
-        src="src/wallet/faucet_server",
+        src="./faucet_server/",
         name="faucet-server-files"
     )
     service = plan.add_service(
